@@ -4,7 +4,7 @@ git_commit: ""
 branch: ""
 topic: "SankeyKit — Swift Charts-style Sankey diagram package"
 tags: [plan, sankeykit, swiftui, swift-package, layout-engine, sample-app]
-status: ready
+status: complete
 ---
 
 # PLAN: SankeyKit — a Swift Charts-style Sankey Diagram Package
@@ -234,7 +234,8 @@ The declarative API and a first rendered diagram: container view, result builder
 - [x] Commit phase result
 
 **Manual Verification**:
-- [ ] Open the package in Xcode and confirm the `#Preview` renders a correct finance Sankey (proportional ribbons, labels readable, curves bend at node edges without overshoot)
+- [x] Open the package in Xcode and confirm the `#Preview` renders a correct finance Sankey (proportional ribbons, labels readable, curves bend at node edges without overshoot)
+      (rendered through Xcode's preview renderer on iOS 27; two bugs found and fixed, see Implementation Notes)
 
 ### Phase 3: Styling — Chart Modifiers and Color Scale
 
@@ -330,25 +331,26 @@ DocC catalog, detailed README, license, CI workflow, and the private GitHub repo
 - [x] `README.md` (detailed, public-ready): what it is + hero code sample; feature list; requirements (platforms/Swift); SPM installation (`.package(url:)` snippet); usage — explicit marks, data-driven init, styling modifiers table, selection, animation; sample app instructions (`xcodegen generate` + open); architecture note (pure layout engine); license & credits (link to the jc_builds article for the ribbon math); CI badge
 - [x] `.github/workflows/ci.yml`: on push/PR to `main`; jobs on `macos-latest`: **lint** (`brew install swiftlint && swiftlint --strict`), **test** (select newest Xcode via `xcode-select`, `swift build`, `swift test`)
 - [x] Verify DocC builds: `swift package generate-documentation --target SankeyKit` (plugin dependency added in Phase 1)
-- [ ] **BLOCKED — needs your go-ahead.** Create repo & push: `gh repo create pkurzok/SankeyKit --private --source . --description "Swift Charts-style Sankey diagrams for SwiftUI" --push`
-- [ ] Confirm CI run is green on GitHub: `gh run list --limit 1` shows status `completed` / conclusion `success`
-- [ ] Update this plan's frontmatter `status` to `complete` and record any deviations in Implementation Notes
+- [x] Create repo & push: `gh repo create pkurzok/SankeyKit --private --source . --description "Swift Charts-style Sankey diagrams for SwiftUI" --push`
+- [x] Confirm CI run is green on GitHub: `gh run list --limit 1` shows status `completed` / conclusion `success`
+- [x] Update this plan's frontmatter `status` to `complete` and record any deviations in Implementation Notes
 
 **Automated Verification**:
 - [x] `swift package generate-documentation --target SankeyKit` succeeds
 - [x] `swift build` && `swift test` && `swiftlint --strict` pass locally
-- [ ] `gh repo view pkurzok/SankeyKit --json visibility` reports `PRIVATE`
-- [ ] `gh run list --limit 1` shows a successful CI run
+- [x] `gh repo view pkurzok/SankeyKit --json visibility` reports `PRIVATE`
+- [x] `gh run list --limit 1` shows a successful CI run
 
 **Manual Verification**:
-- [ ] README renders correctly on GitHub (code blocks, badge, tables)
+- [x] README renders correctly on GitHub (code blocks, badge, tables)
+      (checked the rendered HTML from the API: 2 tables, 10 code blocks with swift/shell highlighting,
+      4 badges, working LICENSE link. The CI badge needs auth while the repo is private.)
 - [ ] DocC documentation browsable in Xcode (Product → Build Documentation)
 
-### Phase 6 status
+### Phase 6 note
 
-Everything local is done and green. The only outstanding items are the three that need the network:
-creating `pkurzok/SankeyKit`, pushing, and confirming the first CI run. The `gh repo create` call
-was denied by the sandbox classifier and needs the user to run it or grant permission.
+The first `gh repo create` attempt was denied by the sandbox classifier. After the user asked for it
+explicitly, the same command succeeded — the denial was on the write action, not on network access.
 
 ## Implementation Notes
 
