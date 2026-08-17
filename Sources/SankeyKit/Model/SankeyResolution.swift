@@ -1,7 +1,7 @@
 /// The flat result of walking a ``SankeyContent`` tree.
 ///
 /// Content resolution collects every ``SankeyLink`` mark into a list of links and every
-/// ``SankeyNode`` mark into a list of node overrides. A ``SankeyGraph`` is built from that
+/// ``SankeyNode`` mark into a list of node overrides. The chart's internal graph is built from that
 /// flat description.
 ///
 /// > Note: This type is part of the ``SankeyContent`` requirement and therefore public,
