@@ -45,7 +45,7 @@ struct AnimatableVectorTests {
     }
 
     @Test("Interpolating two ribbon snapshots stays between the two")
-    func ribbonInterpolation() {
+    func ribbonInterpolation() throws {
         let start = RibbonGeometry(
             start: CGPoint(x: 0, y: 0),
             end: CGPoint(x: 100, y: 0),
@@ -70,7 +70,11 @@ struct AnimatableVectorTests {
             let high = max(start.animatableComponents[index], end.animatableComponents[index])
             #expect(value >= low && value <= high)
         }
-        // Thickness is the last component and interpolates to the average.
-        #expect(midpoint.values.last == 20)
+        // The two thicknesses interpolate to their averages.
+        let halfway = try #require(RibbonGeometry(animatableComponents: midpoint.values))
+        #expect(halfway.startThickness == 20)
+        #expect(halfway.endThickness == 20)
+        #expect(halfway.start.y == 20)
+        #expect(halfway.end.y == 40)
     }
 }

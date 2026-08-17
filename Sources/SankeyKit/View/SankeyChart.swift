@@ -39,7 +39,8 @@ public struct SankeyChart<Content: SankeyContent>: View {
                     graph: graph,
                     size: proxy.size,
                     metrics: configuration.metrics,
-                    scale: configuration.colorScale
+                    scale: configuration.colorScale,
+                    selection: configuration.selection
                 )
             }
             .clipped()
@@ -155,4 +156,35 @@ struct SankeyDiagnosticView: View {
     .sankeyColorScale([.blue, .cyan, .teal, .green, .yellow, .orange, .pink])
     .padding(24)
     .frame(maxWidth: 520, maxHeight: 320)
+}
+
+#Preview("Interactive") {
+    @Previewable @State var selection: SankeySelection?
+    @Previewable @State var savesMore = false
+
+    let readout: String = switch selection {
+    case nil: "Nothing selected — tap a node or a flow"
+    case .node(let name): "Node: \(name)"
+    case .link(let source, let target): "Flow: \(source) → \(target)"
+    }
+
+    VStack(spacing: 16) {
+        SankeyChart {
+            SankeyLink(from: "Salary", to: "Budget", value: 4800)
+            SankeyLink(from: "Budget", to: "Rent", value: 1900)
+            SankeyLink(from: "Budget", to: "Groceries", value: 800)
+            SankeyLink(from: "Budget", to: "Savings", value: savesMore ? 2100 : 700)
+        }
+        .sankeySelection($selection)
+        .frame(maxHeight: 280)
+
+        Text(readout)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+
+        Button(savesMore ? "Save less" : "Save more") {
+            withAnimation(.snappy) { savesMore.toggle() }
+        }
+    }
+    .padding(24)
 }

@@ -8,6 +8,8 @@ struct SankeyConfiguration {
     var metrics = SankeyMetrics()
     /// Colors assigned to nodes in `(layer, y)` order. `nil` means "use the built-in palette".
     var colorScale: [Color]?
+    /// Where a tap on a node or ribbon is reported. `nil` means the chart is read-only.
+    var selection: Binding<SankeySelection?>?
 }
 
 extension EnvironmentValues {
@@ -80,5 +82,26 @@ extension View {
     /// - Parameter colors: The colors to cycle through.
     public func sankeyColorScale(_ colors: [Color]) -> some View {
         transformEnvironment(\.sankeyConfiguration) { $0.colorScale = colors.isEmpty ? nil : colors }
+    }
+
+    /// Lets the reader select a node or a ribbon by tapping it.
+    ///
+    /// The selected element and everything it connects to stay at full opacity; the rest of the
+    /// diagram dims. Tapping the selected element again, or tapping the background, clears the
+    /// selection. Without this modifier the chart is read-only and lets taps pass straight through.
+    ///
+    /// ```swift
+    /// @State private var selection: SankeySelection?
+    ///
+    /// SankeyChart { … }
+    ///     .sankeySelection($selection)
+    /// ```
+    ///
+    /// > Note: On tvOS the diagram stays read-only. `onTapGesture` compiles there, but a shape
+    /// cannot take focus, so per-element taps never arrive.
+    ///
+    /// - Parameter selection: The binding that receives the selected element.
+    public func sankeySelection(_ selection: Binding<SankeySelection?>) -> some View {
+        transformEnvironment(\.sankeyConfiguration) { $0.selection = selection }
     }
 }

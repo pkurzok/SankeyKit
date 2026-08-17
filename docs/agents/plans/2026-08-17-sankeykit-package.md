@@ -266,21 +266,21 @@ Dependencies: Phase 3
 Tap selection with dimming, animated layout transitions, and VoiceOver support.
 
 **Tasks**:
-- [ ] `.sankeySelection(_ selection: Binding<SankeySelection?>)` modifier storing the binding in `SankeyConfiguration`
-- [ ] Hit handling in `SankeyChart`: `.onTapGesture` on each node/ribbon shape sets the binding (`nil` on tapping the selected element again or the background). tvOS caveat: `onTapGesture` compiles on tvOS 17 but per-shape taps are effectively non-functional without focus — document selection as iOS/macOS/visionOS/watchOS; tvOS renders read-only
-- [ ] Dimming: pure helper `relatedElements(to selection: SankeySelection, in graph: SankeyGraph) -> (nodes: Set<String>, links: Set<LinkID>)` — a selected node keeps itself + all adjacent links + their counterpart nodes at full opacity; a selected link keeps itself + its two nodes; everything else drops to 0.25 opacity via `.opacity` with `.animation(.snappy, value: selection)`
-- [ ] Animation: `RibbonShape` conforms to `Animatable` with `animatableData: AnimatableVector` built from the 8 geometry points + thickness; `NodeShape` frames animate via standard frame animation; document that callers animate data changes with `withAnimation` (matching SwiftUI convention)
-- [ ] `View/SankeyChart+Accessibility.swift`:
+- [x] `.sankeySelection(_ selection: Binding<SankeySelection?>)` modifier storing the binding in `SankeyConfiguration`
+- [x] Hit handling in `SankeyChart`: `.onTapGesture` on each node/ribbon shape sets the binding (`nil` on tapping the selected element again or the background). tvOS caveat: `onTapGesture` compiles on tvOS 17 but per-shape taps are effectively non-functional without focus — document selection as iOS/macOS/visionOS/watchOS; tvOS renders read-only
+- [x] Dimming: pure helper `relatedElements(to selection: SankeySelection, in graph: SankeyGraph) -> (nodes: Set<String>, links: Set<LinkID>)` — a selected node keeps itself + all adjacent links + their counterpart nodes at full opacity; a selected link keeps itself + its two nodes; everything else drops to 0.25 opacity via `.opacity` with `.animation(.snappy, value: selection)`
+- [x] Animation: `RibbonShape` conforms to `Animatable` with `animatableData: AnimatableVector` built from the 8 geometry points + thickness; `NodeShape` frames animate via standard frame animation; document that callers animate data changes with `withAnimation` (matching SwiftUI convention)
+- [x] `View/SankeyChart+Accessibility.swift`:
   - each node: `.accessibilityElement()`, label = display label, value = formatted total magnitude
   - each link: label "\(sourceLabel) to \(targetLabel)", value = formatted value; uses `SankeyValue` labels when provided ("Amount: 4.800")
   - reading order sorted by (layer, y) via `.accessibilitySortPriority`
   - selected element gets `.accessibilityAddTraits(.isSelected)`
-- [ ] Tests (`SelectionTests`): related-element computation for node selection (middle node of a chain), link selection, `nil` selection returns everything; `AnimatableVector` interpolation of two `RibbonGeometry` snapshots stays monotonic (midpoint between endpoints)
+- [x] Tests (`SelectionTests`): related-element computation for node selection (middle node of a chain), link selection, `nil` selection returns everything; `AnimatableVector` interpolation of two `RibbonGeometry` snapshots stays monotonic (midpoint between endpoints)
 
 **Automated Verification**:
-- [ ] `swift build` && `swift test` pass
-- [ ] `swiftlint --strict` passes
-- [ ] Commit phase result
+- [x] `swift build` && `swift test` pass
+- [x] `swiftlint --strict` passes
+- [x] Commit phase result
 
 **Manual Verification**:
 - [ ] In the Xcode preview: tapping a node dims unrelated flows smoothly; tapping again deselects
