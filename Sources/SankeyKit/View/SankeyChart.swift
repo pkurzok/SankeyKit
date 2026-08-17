@@ -24,6 +24,8 @@ public struct SankeyChart<Content: SankeyContent>: View {
     /// The mark tree this chart draws.
     let content: Content
 
+    @Environment(\.sankeyConfiguration) private var configuration
+
     /// Creates a chart from marks written in a builder closure.
     public init(@SankeyContentBuilder content: () -> Content) {
         self.content = content()
@@ -33,7 +35,12 @@ public struct SankeyChart<Content: SankeyContent>: View {
         switch makeGraph() {
         case .success(let graph):
             GeometryReader { proxy in
-                SankeyDiagram(graph: graph, size: proxy.size, metrics: .default)
+                SankeyDiagram(
+                    graph: graph,
+                    size: proxy.size,
+                    metrics: configuration.metrics,
+                    scale: configuration.colorScale
+                )
             }
             .clipped()
         case .failure(let error):
@@ -115,6 +122,37 @@ struct SankeyDiagnosticView: View {
         SankeyNode("Budget")
             .label("Monthly Budget")
     }
+    .padding(24)
+    .frame(maxWidth: 520, maxHeight: 320)
+}
+
+#Preview("Styled") {
+    let flows = [
+        ("Coal", "Power plant", 40.0),
+        ("Gas", "Power plant", 25.0),
+        ("Wind", "Grid", 30.0),
+        ("Power plant", "Grid", 45.0),
+        ("Power plant", "Losses", 20.0),
+        ("Grid", "Homes", 40.0),
+        ("Grid", "Industry", 35.0)
+    ]
+    return SankeyChart(flows) { flow in
+        SankeyLink(
+            from: .value("Source", flow.0),
+            to: .value("Target", flow.1),
+            value: .value("Energy", flow.2)
+        )
+        if flow.1 == "Losses" {
+            SankeyNode("Losses").foregroundStyle(.gray)
+        }
+    }
+    .sankeyNodeWidth(16)
+    .sankeyNodeSpacing(14)
+    .sankeyNodeCornerRadius(8)
+    .sankeyLinkSpacing(5)
+    .sankeyLinkCurvature(0.55)
+    .sankeyLinkOpacity(0.85)
+    .sankeyColorScale([.blue, .cyan, .teal, .green, .yellow, .orange, .pink])
     .padding(24)
     .frame(maxWidth: 520, maxHeight: 320)
 }

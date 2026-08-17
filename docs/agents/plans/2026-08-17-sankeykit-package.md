@@ -243,21 +243,21 @@ Dependencies: Phase 2
 The "public knobs", Swift Charts-style: environment-backed `View` modifiers plus a color scale, with clear precedence (per-element mark modifier > color scale > default palette).
 
 **Tasks**:
-- [ ] `View/SankeyConfiguration.swift`: internal `SankeyConfiguration` struct (metrics + optional `[Color]` scale + selection binding placeholder for Phase 4) as an `@Entry` environment value; public `View` extensions:
+- [x] `View/SankeyConfiguration.swift`: internal `SankeyConfiguration` struct (metrics + optional `[Color]` scale + selection binding placeholder for Phase 4) as an `@Entry` environment value; public `View` extensions:
   - `.sankeyNodeWidth(_ width: CGFloat)`
   - `.sankeyNodeSpacing(_ spacing: CGFloat)`
   - `.sankeyNodeCornerRadius(_ radius: CGFloat)`
   - `.sankeyLinkCurvature(_ curvature: Double)` — clamped to `0...1`
   - `.sankeyLinkOpacity(_ opacity: Double)` — clamped to `0...1`
   - `.sankeyColorScale(_ colors: [Color])` — assigned to nodes in (layer, y) order, cycling
-- [ ] `SankeyChart` reads the environment configuration and feeds `SankeyMetrics` into layout; style resolution helper decides final node/link fill with documented precedence
-- [ ] Tests (`StyleResolutionTests`): scale cycling over more nodes than colors; `SankeyNode.foregroundStyle` beats scale; `SankeyLink.foregroundStyle` beats source-node color; curvature/opacity clamping; default metrics used when no modifier present
-- [ ] Extend `#Preview` with a styled variant exercising every modifier
+- [x] `SankeyChart` reads the environment configuration and feeds `SankeyMetrics` into layout; style resolution helper decides final node/link fill with documented precedence
+- [x] Tests (`StyleResolutionTests`): scale cycling over more nodes than colors; `SankeyNode.foregroundStyle` beats scale; `SankeyLink.foregroundStyle` beats source-node color; curvature/opacity clamping; default metrics used when no modifier present
+- [x] Extend `#Preview` with a styled variant exercising every modifier
 
 **Automated Verification**:
-- [ ] `swift build` && `swift test` pass
-- [ ] `swiftlint --strict` passes
-- [ ] Commit phase result
+- [x] `swift build` && `swift test` pass
+- [x] `swiftlint --strict` passes
+- [x] Commit phase result
 
 ### Phase 4: Interaction, Animation, Accessibility
 
@@ -343,6 +343,58 @@ DocC catalog, detailed README, license, CI workflow, and the private GitHub repo
 ## Implementation Notes
 
 During implementation, document user feedback, problems, and decisions here.
+
+### Toolchain
+
+- The `swift` on `PATH` is swiftly's **6.2.3**, and it hangs indefinitely compiling
+  `swift-docc-plugin`'s `swift-tools-version:5.7` manifest (killed after 9 minutes at 100% CPU).
+  Xcode 27's toolchain (Swift 6.4) resolves the same package in ~4 s. **All local commands are run
+  through `xcrun swift …`.** CI on `macos-latest` has no swiftly, so plain `swift build` is fine
+  there.
+
+### User feedback after Phase 2 — prettier ribbons (folded into Phase 3)
+
+The first render was correct but plain. Requested: colors that gradually merge into each other,
+and more spacing between the links. Resulting deviations from the plan:
+
+- `RibbonGeometry` carries **a thickness per end** (`startThickness` / `endThickness`) instead of a
+  single `thickness`, so a node can insert a gap between the ribbons attached to it. The gaps are
+  taken out of the node's own extent rather than added to it, so each side still matches the node's
+  in- or outflow; a ribbon tapers when its two nodes carry different numbers of links.
+  `animatableComponents` is therefore **10 scalars, not 9**.
+- New metric `SankeyMetrics.linkSpacing` (default 3 pt) with a matching
+  `.sankeyLinkSpacing(_:)` modifier — one more knob than the plan listed. Clamped so gaps never
+  consume more than half of a node edge.
+- Ribbons are filled with a **gradient from source-node color to target-node color**, interpolated
+  in `Gradient.ColorSpace.perceptual` (available from iOS 16 / macOS 13, below all our minimums, so
+  no availability gating). `SankeyNode.foregroundStyle` also records a `tint` when the style is a
+  plain `Color`, so a customized node blends its ribbons too.
+- The **default palette was replaced** by a hue-ordered ramp, so neighbouring nodes get
+  neighbouring hues and their gradients stay saturated instead of passing through grey.
+- Node spacing is clamped per layer, so a crowded column no longer collapses the vertical scale to
+  zero and renders nothing.
+
+### Structural deviations found with Xcode's preview renderer
+
+Both of these were found by rendering the `#Preview` through the Xcode MCP server, not by the
+compiler:
+
+- The data-driven initializer originally delegated with `self.init(resolvedContent:)`. Xcode's
+  preview instrumentation wraps every expression in `__designTimeSelection(…)` and cannot nest
+  `self.init` inside it, which broke **every** `#Preview` in that file. The initializer now assigns
+  the stored property directly, and `init(resolvedContent:)` is gone.
+- The diagram was assembled in a `@ViewBuilder` method on `SankeyChart`. That rendered blank on iOS
+  and segfaulted the preview agent inside `ForEachState.item(at:offset:)`. It is now built from
+  real `View` structs in **`View/SankeyDiagram.swift`** (`SankeyDiagram` + `RibbonLayer` /
+  `NodeLayer` / `LabelLayer`) — a file the plan did not list.
+
+### Other additions
+
+- **`View/SankeyStyle.swift`** (not in the plan) holds the `SankeyFill` enum and
+  `SankeyStyleResolver`. Resolving to a `SankeyFill` rather than straight to `AnyShapeStyle` keeps
+  the precedence rules unit-testable, since `AnyShapeStyle` cannot be compared.
+- `SankeyMetrics` clamps its own properties on assignment (`didSet`), so clamping is intrinsic and
+  testable rather than duplicated across the modifiers.
 
 ## References
 
