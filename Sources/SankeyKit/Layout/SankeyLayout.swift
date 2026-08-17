@@ -3,22 +3,24 @@ import CoreGraphics
 /// The tunable numbers of a Sankey diagram.
 ///
 /// Every value has a chart modifier counterpart, for example ``SwiftUICore/View/sankeyNodeWidth(_:)``.
+/// The properties clamp themselves on assignment, so a caller cannot push the layout into a state
+/// it has no sensible answer for.
 struct SankeyMetrics: Equatable, Sendable {
-    /// Width of a node rectangle in points.
-    var nodeWidth: CGFloat = 12
-    /// Vertical gap between two stacked nodes in points.
-    var nodeSpacing: CGFloat = 8
+    /// Width of a node rectangle in points. Never negative.
+    var nodeWidth: CGFloat = 12 { didSet { nodeWidth = max(0, nodeWidth) } }
+    /// Vertical gap between two stacked nodes in points. Never negative.
+    var nodeSpacing: CGFloat = 8 { didSet { nodeSpacing = max(0, nodeSpacing) } }
     /// Vertical gap between two ribbons where they meet the same node, in points.
     ///
     /// The gap is taken out of the node edge the ribbons share, so a ribbon can be a little
-    /// thinner at a busy node than at a quiet one.
-    var linkSpacing: CGFloat = 3
-    /// Corner radius of a node rectangle in points.
-    var cornerRadius: CGFloat = 3
+    /// thinner at a busy node than at a quiet one. Never negative.
+    var linkSpacing: CGFloat = 3 { didSet { linkSpacing = max(0, linkSpacing) } }
+    /// Corner radius of a node rectangle in points. Never negative.
+    var cornerRadius: CGFloat = 3 { didSet { cornerRadius = max(0, cornerRadius) } }
     /// How strongly ribbons bend, `0` (straight) to `1` (maximum).
-    var curvature: Double = 0.5
+    var curvature: Double = 0.5 { didSet { curvature = min(max(curvature, 0), 1) } }
     /// Default opacity of a ribbon, `0`–`1`.
-    var linkOpacity: Double = 0.75
+    var linkOpacity: Double = 0.75 { didSet { linkOpacity = min(max(linkOpacity, 0), 1) } }
 
     static let `default` = SankeyMetrics()
 }

@@ -1,5 +1,38 @@
 import SwiftUI
 
+/// How one element of the diagram should be painted.
+///
+/// Keeping this separate from `ShapeStyle` makes the precedence rules in ``SankeyStyleResolver``
+/// inspectable — an `AnyShapeStyle` can be drawn but not compared.
+enum SankeyFill {
+    /// A style set directly on the mark.
+    case style(AnyShapeStyle)
+    /// A flat color taken from the chart's color scale.
+    case color(Color)
+    /// A blend from the source node's color to the target node's color.
+    case gradient(from: Color, to: Color)
+}
+
+extension SankeyFill {
+    /// The flat color, if this fill is one.
+    var color: Color? {
+        if case .color(let color) = self { return color }
+        return nil
+    }
+
+    /// The two ends of the blend, if this fill is a gradient.
+    var gradientColors: (from: Color, to: Color)? {
+        if case .gradient(let from, let to) = self { return (from, to) }
+        return nil
+    }
+
+    /// Whether the fill came from a style set on the mark itself.
+    var isExplicitStyle: Bool {
+        if case .style = self { return true }
+        return false
+    }
+}
+
 /// Decides the final fill of every node and ribbon.
 ///
 /// Precedence for a node, highest first:
@@ -41,7 +74,7 @@ struct SankeyStyleResolver {
         self.canvasSize = canvasSize
     }
 
-    /// The color a node takes from the scale, ignoring any style set on the mark.
+    /// The color at a position in the scale, cycling for indices beyond its end.
     func scaleColor(at index: Int) -> Color {
         scale[((index % scale.count) + scale.count) % scale.count]
     }
@@ -51,27 +84,21 @@ struct SankeyStyleResolver {
         node.node.tint ?? scaleColor(at: node.paletteIndex)
     }
 
-    /// The fill of a node rectangle.
-    func nodeStyle(_ node: LaidOutNode) -> AnyShapeStyle {
-        node.node.style ?? AnyShapeStyle(nodeColor(node))
+    /// How a node rectangle is painted.
+    func nodeFill(_ node: LaidOutNode) -> SankeyFill {
+        if let style = node.node.style {
+            return .style(style)
+        }
+        return .color(scaleColor(at: node.paletteIndex))
     }
 
-    /// The fill of a ribbon: its own style, or a gradient from its source to its target color.
-    func linkStyle(_ link: LaidOutLink, from source: LaidOutNode?, to target: LaidOutNode?) -> AnyShapeStyle {
+    /// How a ribbon is painted.
+    func linkFill(_ link: LaidOutLink, from source: LaidOutNode?, to target: LaidOutNode?) -> SankeyFill {
         if let style = link.link.style {
-            return style
+            return .style(style)
         }
         let leading = source.map(nodeColor) ?? scaleColor(at: 0)
-        let trailing = target.map(nodeColor) ?? leading
-        // Interpolating perceptually keeps the middle of the ribbon from turning grey when the
-        // two nodes sit far apart on the color wheel.
-        return AnyShapeStyle(
-            .linearGradient(
-                Gradient(colors: [leading, trailing]).colorSpace(.perceptual),
-                startPoint: unitPoint(atX: link.geometry.start.x),
-                endPoint: unitPoint(atX: link.geometry.end.x)
-            )
-        )
+        return .gradient(from: leading, to: target.map(nodeColor) ?? leading)
     }
 
     /// The opacity of a ribbon: the per-link value when set, otherwise the chart default.
@@ -79,8 +106,31 @@ struct SankeyStyleResolver {
         link.link.opacity ?? defaultOpacity
     }
 
-    /// Ribbons are drawn in the chart's coordinate space, so a gradient endpoint has to be
-    /// expressed relative to the whole canvas rather than to the ribbon's own bounds.
+    /// Turns a fill into something SwiftUI can paint.
+    ///
+    /// A gradient is anchored to the ribbon's two endpoints. Ribbons are drawn in the chart's
+    /// coordinate space rather than their own bounds, so the endpoints have to be expressed
+    /// relative to the whole canvas.
+    func shapeStyle(for fill: SankeyFill, spanning geometry: RibbonGeometry? = nil) -> AnyShapeStyle {
+        switch fill {
+        case .style(let style):
+            return style
+        case .color(let color):
+            return AnyShapeStyle(color)
+        case .gradient(let from, let to):
+            guard let geometry else { return AnyShapeStyle(from) }
+            // Interpolating perceptually keeps the middle of the ribbon from turning grey when
+            // the two nodes sit far apart on the color wheel.
+            return AnyShapeStyle(
+                .linearGradient(
+                    Gradient(colors: [from, to]).colorSpace(.perceptual),
+                    startPoint: unitPoint(atX: geometry.start.x),
+                    endPoint: unitPoint(atX: geometry.end.x)
+                )
+            )
+        }
+    }
+
     private func unitPoint(atX x: CGFloat) -> UnitPoint {
         guard canvasSize.width > 0 else { return UnitPoint(x: 0, y: 0.5) }
         return UnitPoint(x: x / canvasSize.width, y: 0.5)

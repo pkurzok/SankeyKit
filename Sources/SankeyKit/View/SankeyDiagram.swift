@@ -44,14 +44,13 @@ private struct RibbonLayer: View {
     var body: some View {
         let nodesByID = Dictionary(uniqueKeysWithValues: layout.nodes.map { ($0.id, $0) })
         ForEach(layout.links) { laidOut in
+            let fill = resolver.linkFill(
+                laidOut,
+                from: nodesByID[laidOut.id.source],
+                to: nodesByID[laidOut.id.target]
+            )
             RibbonShape(geometry: laidOut.geometry)
-                .fill(
-                    resolver.linkStyle(
-                        laidOut,
-                        from: nodesByID[laidOut.id.source],
-                        to: nodesByID[laidOut.id.target]
-                    )
-                )
+                .fill(resolver.shapeStyle(for: fill, spanning: laidOut.geometry))
                 .opacity(resolver.linkOpacity(laidOut, default: opacity))
         }
     }
@@ -66,7 +65,7 @@ private struct NodeLayer: View {
     var body: some View {
         ForEach(layout.nodes) { node in
             NodeShape(frame: node.frame, cornerRadius: cornerRadius)
-                .fill(resolver.nodeStyle(node))
+                .fill(resolver.shapeStyle(for: resolver.nodeFill(node)))
         }
     }
 }
