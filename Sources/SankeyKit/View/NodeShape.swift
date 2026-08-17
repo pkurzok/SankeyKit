@@ -5,6 +5,12 @@ struct NodeShape: Shape {
     var frame: CGRect
     var cornerRadius: CGFloat
 
+    /// Lets a node slide and grow smoothly when the values behind it change.
+    var animatableData: CGRect.AnimatableData {
+        get { frame.animatableData }
+        set { frame.animatableData = newValue }
+    }
+
     func path(in rect: CGRect) -> Path {
         Path(roundedRect: frame, cornerRadius: min(cornerRadius, frame.height / 2))
     }

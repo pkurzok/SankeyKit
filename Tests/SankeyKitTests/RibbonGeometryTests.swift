@@ -73,13 +73,31 @@ struct RibbonGeometryTests {
         #expect(geometry.bottomCurve.control2.y - geometry.topCurve.control2.y == 20)
     }
 
-    @Test("A ribbon exposes ten animatable components")
-    func animatableComponents() {
-        let geometry = ribbon(from: CGPoint(x: 1, y: 2), to: CGPoint(x: 101, y: 42), thickness: 7, endThickness: 9)
+    @Test("A ribbon round-trips through its animatable components")
+    func animatableComponents() throws {
+        let geometry = ribbon(
+            from: CGPoint(x: 1, y: 2),
+            to: CGPoint(x: 101, y: 42),
+            thickness: 7,
+            endThickness: 9,
+            curvature: 0.4
+        )
         let components = geometry.animatableComponents
-        #expect(components.count == 10)
-        #expect(components.first == 1)
-        #expect(components.suffix(2) == [7, 9])
+        #expect(components.count == RibbonGeometry.componentCount)
+        #expect(try #require(RibbonGeometry(animatableComponents: components)) == geometry)
+    }
+
+    @Test("Rebuilding from a malformed component list fails instead of trapping")
+    func malformedComponents() {
+        #expect(RibbonGeometry(animatableComponents: []) == nil)
+        #expect(RibbonGeometry(animatableComponents: [1, 2, 3]) == nil)
+    }
+
+    @Test("Interpolation can never produce a negative thickness")
+    func negativeThicknessIsClamped() throws {
+        let geometry = try #require(RibbonGeometry(animatableComponents: [0, 0, 10, 0, -4, -2, 0.5]))
+        #expect(geometry.startThickness == 0)
+        #expect(geometry.endThickness == 0)
     }
 
     @Test("A tapering ribbon offsets each end by its own half thickness")

@@ -7,6 +7,16 @@ import SwiftUI
 struct RibbonShape: Shape {
     var geometry: RibbonGeometry
 
+    /// Lets SwiftUI morph one ribbon into another when the underlying values change.
+    var animatableData: AnimatableVector {
+        get { AnimatableVector(geometry.animatableComponents) }
+        set {
+            if let interpolated = RibbonGeometry(animatableComponents: newValue.values) {
+                geometry = interpolated
+            }
+        }
+    }
+
     func path(in rect: CGRect) -> Path {
         var path = Path()
         guard geometry.startThickness > 0 || geometry.endThickness > 0 else { return path }

@@ -69,16 +69,30 @@ struct RibbonGeometry: Equatable, Sendable {
 }
 
 extension RibbonGeometry {
-    /// The ten scalars that fully describe the ribbon, for interpolation during animation:
-    /// start, end, both control points and the two thicknesses.
+    /// The seven scalars that fully describe the ribbon, for interpolation during animation.
+    ///
+    /// The control points are deliberately *not* part of this list. They are recomputed from the
+    /// interpolated endpoints on every frame, which keeps every intermediate frame a proper
+    /// S-curve instead of letting the curve and its endpoints drift apart.
     var animatableComponents: [CGFloat] {
-        let (first, second) = controlPoints
-        return [
-            start.x, start.y,
-            first.x, first.y,
-            second.x, second.y,
-            end.x, end.y,
-            startThickness, endThickness
-        ]
+        [start.x, start.y, end.x, end.y, startThickness, endThickness, CGFloat(curvature)]
+    }
+
+    /// The number of scalars ``animatableComponents`` produces.
+    static let componentCount = 7
+
+    /// Rebuilds a ribbon from interpolated components.
+    ///
+    /// - Parameter components: A list produced by ``animatableComponents``. A list of any other
+    ///   length is ignored and leaves the ribbon unchanged, so a malformed animation can never trap.
+    init?(animatableComponents components: [CGFloat]) {
+        guard components.count == Self.componentCount else { return nil }
+        self.init(
+            start: CGPoint(x: components[0], y: components[1]),
+            end: CGPoint(x: components[2], y: components[3]),
+            startThickness: max(0, components[4]),
+            endThickness: max(0, components[5]),
+            curvature: Double(components[6])
+        )
     }
 }
