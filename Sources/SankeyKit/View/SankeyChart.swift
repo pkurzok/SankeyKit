@@ -29,15 +29,11 @@ public struct SankeyChart<Content: SankeyContent>: View {
         self.content = content()
     }
 
-    init(resolvedContent: Content) {
-        self.content = resolvedContent
-    }
-
     public var body: some View {
         switch makeGraph() {
         case .success(let graph):
             GeometryReader { proxy in
-                diagram(graph: graph, size: proxy.size)
+                SankeyDiagram(graph: graph, size: proxy.size, metrics: .default)
             }
             .clipped()
         case .failure(let error):
@@ -53,43 +49,6 @@ public struct SankeyChart<Content: SankeyContent>: View {
         } catch {
             return .failure(error)
         }
-    }
-
-    @ViewBuilder
-    private func diagram(graph: SankeyGraph, size: CGSize) -> some View {
-        let metrics = SankeyMetrics.default
-        let layout = SankeyLayout.compute(graph: graph, size: size, metrics: metrics)
-        let resolver = SankeyStyleResolver()
-        let nodesByID = Dictionary(uniqueKeysWithValues: layout.nodes.map { ($0.id, $0) })
-        let slotWidth = Self.labelSlotWidth(size: size, layerCount: layout.layerCount, metrics: metrics)
-
-        ZStack(alignment: .topLeading) {
-            ForEach(layout.links) { laidOut in
-                RibbonShape(geometry: laidOut.geometry)
-                    .fill(resolver.linkStyle(laidOut, sourceNode: nodesByID[laidOut.id.source]))
-                    .opacity(resolver.linkOpacity(laidOut, default: metrics.linkOpacity))
-            }
-            ForEach(layout.nodes) { node in
-                NodeShape(frame: node.frame, cornerRadius: metrics.cornerRadius)
-                    .fill(resolver.nodeStyle(node))
-            }
-            ForEach(layout.nodes) { node in
-                NodeLabel(
-                    node: node,
-                    isTrailingColumn: node.layer == layout.layerCount - 1,
-                    slotWidth: slotWidth
-                )
-            }
-        }
-        .frame(width: size.width, height: size.height, alignment: .topLeading)
-    }
-
-    /// Horizontal room a label may use: the gap between two columns, within sensible bounds.
-    static func labelSlotWidth(size: CGSize, layerCount: Int, metrics: SankeyMetrics) -> CGFloat {
-        guard layerCount > 1 else { return max(0, size.width - metrics.nodeWidth - NodeLabel.gap) }
-        let stride = (size.width - metrics.nodeWidth) / CGFloat(layerCount - 1)
-        let room = stride - metrics.nodeWidth - 2 * NodeLabel.gap
-        return min(max(room, 32), 160)
     }
 }
 
@@ -109,11 +68,15 @@ extension SankeyChart {
     /// - Parameters:
     ///   - data: The collection to draw.
     ///   - content: Builds the marks for one element.
+    ///
+    /// > Note: This initializer assigns the stored property instead of delegating to another
+    /// initializer. Xcode's preview instrumentation wraps every expression in a call it cannot
+    /// nest `self.init` inside, which would break any `#Preview` declared in this file.
     public init<Data: RandomAccessCollection, C: SankeyContent>(
         _ data: Data,
         @SankeyContentBuilder content: @escaping (Data.Element) -> C
     ) where Content == SankeyForEachContent<Data, C> {
-        self.init(resolvedContent: SankeyForEachContent(data, content: content))
+        self.content = SankeyForEachContent(data, content: content)
     }
 }
 
@@ -153,5 +116,5 @@ struct SankeyDiagnosticView: View {
             .label("Monthly Budget")
     }
     .padding(24)
-    .frame(width: 480, height: 320)
+    .frame(maxWidth: 520, maxHeight: 320)
 }

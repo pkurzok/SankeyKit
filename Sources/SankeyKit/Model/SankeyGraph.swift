@@ -31,6 +31,9 @@ struct NodeOverride: Sendable {
     var name: String
     var displayLabel: String?
     var style: AnyShapeStyle?
+    /// The plain color behind ``style``, when there is one. Ribbons need a color, not a style,
+    /// to build the gradient that blends one node into the next.
+    var tint: Color?
     var pinnedLayer: Int?
 }
 
@@ -39,6 +42,7 @@ struct ResolvedNode: Sendable {
     var id: String
     var displayLabel: String?
     var style: AnyShapeStyle?
+    var tint: Color?
     var pinnedLayer: Int?
     var inflow: Double = 0
     var outflow: Double = 0
@@ -150,6 +154,7 @@ struct SankeyGraph: Sendable {
             }
             if let label = override.displayLabel { byID[override.name]?.displayLabel = label }
             if let style = override.style { byID[override.name]?.style = style }
+            if let tint = override.tint { byID[override.name]?.tint = tint }
             if let layer = override.pinnedLayer { byID[override.name]?.pinnedLayer = layer }
         }
 

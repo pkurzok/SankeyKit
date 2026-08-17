@@ -1,17 +1,23 @@
 import CoreGraphics
 
-/// The geometry of a single link ribbon: where it starts, where it ends, how thick it is and
-/// how strongly it bends.
+/// The geometry of a single link ribbon: where it starts, where it ends, how thick it is at each
+/// end and how strongly it bends.
 ///
 /// A ribbon is drawn as two cubic Bézier curves — one along the top edge, one along the bottom —
 /// joined by straight vertical caps at the two nodes.
+///
+/// The two ends can differ in thickness. A node inserts a small gap between the ribbons attached
+/// to it (see ``SankeyMetrics/linkSpacing``), and how much of the node edge that consumes depends
+/// on how many ribbons meet there. A ribbon therefore tapers slightly from one end to the other.
 struct RibbonGeometry: Equatable, Sendable {
     /// Center of the ribbon where it leaves the source node (the node's trailing edge).
     var start: CGPoint
     /// Center of the ribbon where it enters the target node (the node's leading edge).
     var end: CGPoint
-    /// Vertical thickness of the ribbon, proportional to the link value.
-    var thickness: CGFloat
+    /// Vertical thickness at the source node.
+    var startThickness: CGFloat
+    /// Vertical thickness at the target node.
+    var endThickness: CGFloat
     /// How far the control points travel along the connection, `0`–`1`.
     var curvature: Double
 
@@ -36,18 +42,20 @@ struct RibbonGeometry: Equatable, Sendable {
     }
 
     /// The cubic curve along the top edge of the ribbon.
-    var topCurve: Curve { curve(offsetBy: -thickness / 2) }
+    var topCurve: Curve { curve(direction: -1) }
 
     /// The cubic curve along the bottom edge of the ribbon.
-    var bottomCurve: Curve { curve(offsetBy: thickness / 2) }
+    var bottomCurve: Curve { curve(direction: 1) }
 
-    private func curve(offsetBy dy: CGFloat) -> Curve {
+    private func curve(direction: CGFloat) -> Curve {
         let (first, second) = controlPoints
+        let atStart = direction * startThickness / 2
+        let atEnd = direction * endThickness / 2
         return Curve(
-            start: CGPoint(x: start.x, y: start.y + dy),
-            control1: CGPoint(x: first.x, y: first.y + dy),
-            control2: CGPoint(x: second.x, y: second.y + dy),
-            end: CGPoint(x: end.x, y: end.y + dy)
+            start: CGPoint(x: start.x, y: start.y + atStart),
+            control1: CGPoint(x: first.x, y: first.y + atStart),
+            control2: CGPoint(x: second.x, y: second.y + atEnd),
+            end: CGPoint(x: end.x, y: end.y + atEnd)
         )
     }
 
@@ -61,10 +69,16 @@ struct RibbonGeometry: Equatable, Sendable {
 }
 
 extension RibbonGeometry {
-    /// The nine scalars that fully describe the ribbon, for interpolation during animation:
-    /// start, end, both control points and the thickness.
+    /// The ten scalars that fully describe the ribbon, for interpolation during animation:
+    /// start, end, both control points and the two thicknesses.
     var animatableComponents: [CGFloat] {
         let (first, second) = controlPoints
-        return [start.x, start.y, first.x, first.y, second.x, second.y, end.x, end.y, thickness]
+        return [
+            start.x, start.y,
+            first.x, first.y,
+            second.x, second.y,
+            end.x, end.y,
+            startThickness, endThickness
+        ]
     }
 }
