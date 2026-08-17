@@ -7,6 +7,13 @@
 
 Sankey diagrams for SwiftUI, written the way you write a Swift Chart.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Sources/SankeyKit/Documentation.docc/Resources/sankey-hero~dark@2x.jpg">
+  <img alt="A Sankey diagram of a monthly budget: Salary and Side gig flow into Monthly Budget, which flows out to Rent, Groceries and Savings. Each ribbon blends from the colour of the node it leaves to the colour of the node it enters." src="Sources/SankeyKit/Documentation.docc/Resources/sankey-hero@2x.jpg">
+</picture>
+
+That picture is the output of exactly this:
+
 ```swift
 import SankeyKit
 
@@ -42,7 +49,7 @@ all the way across.
 - **Animation.** Change a value inside `withAnimation` and the ribbons morph rather than jump.
 - **Accessibility.** Every node and every ribbon is its own element, read in column order.
 - **A pure layout engine.** The geometry is a value-type computation with no view dependencies,
-  covered by 92 unit tests.
+  covered by 100 unit tests.
 
 ## Requirements
 
@@ -146,6 +153,15 @@ Three levels decide a fill, most specific first: the style set on the mark, then
 then the built-in palette. The built-in palette walks the hue wheel, so neighbouring nodes blend
 through neighbouring hues; a custom scale ordered the same way gives the cleanest ribbons.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Sources/SankeyKit/Documentation.docc/Resources/sankey-energy~dark@2x.jpg">
+  <img alt="A four-column Sankey diagram of a national energy balance, from primary sources through power plants and the grid to households, industry and transport, drawn with a custom colour scale." src="Sources/SankeyKit/Documentation.docc/Resources/sankey-energy@2x.jpg">
+</picture>
+
+Labels take care of themselves: the first column reads outward to the left, the last outward to the
+right, and any column in between sits on its own node over a small backing so it stays readable.
+The chart reserves the margin it needs before laying the columns out.
+
 ### Selection
 
 ```swift
@@ -159,6 +175,11 @@ Tapping a node yields `.node("Budget")`, tapping a ribbon yields
 `.link(source: "Budget", target: "Rent")`. The selected element and everything it connects to stay
 at full opacity while the rest drops back. Tapping it again, or tapping the background, clears the
 selection. Without the modifier the chart is read-only and lets taps pass through.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Sources/SankeyKit/Documentation.docc/Resources/sankey-selection~dark@2x.jpg">
+  <img alt="The same budget diagram with the Groceries node selected: Groceries, the ribbon feeding it and the Budget node stay at full opacity while every other node and ribbon fades back." src="Sources/SankeyKit/Documentation.docc/Resources/sankey-selection@2x.jpg">
+</picture>
 
 ### Animation
 
@@ -182,6 +203,8 @@ cd Examples/SankeyDemo
 xcodegen generate
 open SankeyDemo.xcodeproj
 ```
+
+<img width="320" alt="The Finance screen of the SankeyDemo app running on iPhone, showing a budget diagram with labels beside the outer columns and a toggle beneath it." src="Sources/SankeyKit/Documentation.docc/Resources/sankey-demo@2x.jpg">
 
 ## Architecture
 

@@ -400,6 +400,20 @@ compiler:
   real `View` structs in **`View/SankeyDiagram.swift`** (`SankeyDiagram` + `RibbonLayer` /
   `NodeLayer` / `LabelLayer`) — a file the plan did not list.
 
+### User feedback after Phase 6 — label placement and a visual README
+
+- **Labels moved out of the plot area.** The first column now reads outward to the left, the last
+  outward to the right, and any column in between sits on its own node behind a small rounded
+  backing so it stays readable over the ribbons. `SankeyLayout.compute` gained a `horizontalInset`
+  parameter for the margin the outer labels need; the chart derives it from the canvas width
+  (a floor of 64 pt, a ceiling of 140 pt, and never more than 22% of the width, so a phone keeps a
+  usable diagram and a wide chart does not waste half its width on margins).
+- **README screenshots.** `Sources/SankeyKit/Documentation.docc/Resources` holds light and dark
+  renders of the hero, energy and selection charts plus a device screenshot of the demo. They are
+  produced by a throwaway `ImageRenderer` harness, stored as JPEG (~800 KB total instead of ~5 MB
+  of PNG — smooth gradients compress badly as PNG), and used by both the README (via `<picture>`,
+  so GitHub picks the right one per theme) and the DocC pages (via the `~dark` variant naming).
+
 ### Other additions
 
 - **`View/SankeyStyle.swift`** (not in the plan) holds the `SankeyFill` enum and

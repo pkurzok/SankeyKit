@@ -29,6 +29,8 @@ struct BudgetChart: View {
 }
 ```
 
+@Image(source: "sankey-hero", alt: "The budget diagram this code produces.")
+
 That is the whole chart. Six nodes appeared without being declared: a link creates whichever of its
 two endpoints does not exist yet. `Budget` is named by five links and still becomes one node, as
 tall as the larger of what flows in and what flows out.
@@ -134,6 +136,8 @@ everything it connects to stay lit; the rest fades back.
 SankeyChart { /* … */ }
     .sankeySelection($selection)
 ```
+
+@Image(source: "sankey-selection", alt: "The budget diagram with the Groceries node selected; unrelated nodes and ribbons are dimmed.")
 
 Tapping a node selects `.node("Budget")`; tapping a ribbon selects
 `.link(source: "Budget", target: "Rent")`. Tapping the same element again, or tapping the

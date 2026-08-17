@@ -65,10 +65,15 @@ enum SankeyLayout {
     /// The vertical scale is chosen so that the busiest layer exactly fills the available height
     /// minus the spacing between its nodes. All other layers use the same scale, which is what
     /// makes ribbon thickness comparable across the whole diagram.
+    ///
+    /// - Parameter horizontalInset: Room to leave free on the left and on the right, where the
+    ///   labels of the first and last column are drawn. The columns are spread across what is
+    ///   left. Clamped so the diagram always keeps at least half of the width.
     static func compute(
         graph: SankeyGraph,
         size: CGSize,
-        metrics: SankeyMetrics = .default
+        metrics: SankeyMetrics = .default,
+        horizontalInset: CGFloat = 0
     ) -> SankeyLayoutResult {
         guard !graph.isEmpty, size.width > 0, size.height > 0 else { return SankeyLayoutResult() }
 
@@ -76,8 +81,9 @@ enum SankeyLayout {
         let layerCount = buckets.count
         guard layerCount > 0 else { return SankeyLayoutResult() }
 
+        let inset = min(max(0, horizontalInset), size.width / 4)
         let scale = verticalScale(buckets: buckets, height: size.height, spacing: metrics.nodeSpacing)
-        let frames = nodeFrames(buckets: buckets, size: size, metrics: metrics, scale: scale)
+        let frames = nodeFrames(buckets: buckets, size: size, metrics: metrics, scale: scale, inset: inset)
 
         var laidOutNodes: [LaidOutNode] = []
         laidOutNodes.reserveCapacity(graph.nodes.count)
@@ -141,14 +147,15 @@ enum SankeyLayout {
         buckets: [[ResolvedNode]],
         size: CGSize,
         metrics: SankeyMetrics,
-        scale: CGFloat
+        scale: CGFloat,
+        inset: CGFloat
     ) -> [String: CGRect] {
         let layerCount = buckets.count
-        let span = max(0, size.width - metrics.nodeWidth)
+        let span = max(0, size.width - 2 * inset - metrics.nodeWidth)
         var frames: [String: CGRect] = [:]
 
         for (layer, bucket) in buckets.enumerated() {
-            let originX = layerCount > 1 ? span * CGFloat(layer) / CGFloat(layerCount - 1) : 0
+            let originX = inset + (layerCount > 1 ? span * CGFloat(layer) / CGFloat(layerCount - 1) : 0)
             let gap = effectiveNodeSpacing(count: bucket.count, height: size.height, spacing: metrics.nodeSpacing)
             var originY: CGFloat = 0
             for node in bucket {
