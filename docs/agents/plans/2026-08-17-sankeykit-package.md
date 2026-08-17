@@ -283,9 +283,13 @@ Tap selection with dimming, animated layout transitions, and VoiceOver support.
 - [x] Commit phase result
 
 **Manual Verification**:
-- [ ] In the Xcode preview: tapping a node dims unrelated flows smoothly; tapping again deselects
+- [x] In the Xcode preview: tapping a node dims unrelated flows smoothly; tapping again deselects
+      (verified in the iOS simulator instead: tapping the "Groceries" node dims everything except
+      it, its ribbon and "Monthly Budget"; a second tap restores; tapping a ribbon selects the link)
 - [ ] Changing a link value inside `withAnimation` morphs ribbons smoothly (no jumps)
-- [ ] VoiceOver (or Accessibility Inspector) announces nodes and links with meaningful labels and values
+- [x] VoiceOver (or Accessibility Inspector) announces nodes and links with meaningful labels and values
+      (verified from the simulator's accessibility hierarchy: one element per node — `Monthly Budget`
+      value `5.500` — and per link — `Salary to Monthly Budget` value `4.800`)
 
 ### Phase 5: Sample App — SankeyDemo
 
@@ -294,22 +298,22 @@ Dependencies: Phase 4
 A multiplatform (iOS + macOS) demo app in `Examples/SankeyDemo`, generated with XcodeGen, showcasing the full API.
 
 **Tasks**:
-- [ ] `Examples/SankeyDemo/project.yml`: app target `SankeyDemo`, `supportedDestinations: [iOS, macOS]`, deployment targets iOS 17 / macOS 14, local package dependency `../..`, bundle id `de.peterkurzok.SankeyDemo`, generated project gitignored
-- [ ] `SankeyDemoApp.swift`: `TabView` (iOS) / `NavigationSplitView` sidebar (macOS) with the three demos
-- [ ] `FinanceDemoView.swift`: classic income → budget → expense flow using the *explicit-marks* init + `SankeyNode` customization + styling modifiers
-- [ ] `EnergyDemoView.swift`: 4+ layer energy-flow dataset (sources → conversion → distribution → consumption) using the *data-driven* init + `.sankeyColorScale`
-- [ ] `PlaygroundView.swift`: sliders bound to link values (wrapped in `withAnimation`), a `SankeySelection?` state with a readout of the current selection, toggle for an optional link (exercises `buildOptional`)
-- [ ] Verify SwiftLint covers the example sources or keep them excluded (decision: include `Examples/**/Sources` in linting; regenerate `.swiftlint.yml` includes accordingly)
+- [x] `Examples/SankeyDemo/project.yml`: app target `SankeyDemo`, `supportedDestinations: [iOS, macOS]`, deployment targets iOS 17 / macOS 14, local package dependency `../..`, bundle id `de.peterkurzok.SankeyDemo`, generated project gitignored
+- [x] `SankeyDemoApp.swift`: `TabView` (iOS) / `NavigationSplitView` sidebar (macOS) with the three demos
+- [x] `FinanceDemoView.swift`: classic income → budget → expense flow using the *explicit-marks* init + `SankeyNode` customization + styling modifiers
+- [x] `EnergyDemoView.swift`: 4+ layer energy-flow dataset (sources → conversion → distribution → consumption) using the *data-driven* init + `.sankeyColorScale`
+- [x] `PlaygroundView.swift`: sliders bound to link values (wrapped in `withAnimation`), a `SankeySelection?` state with a readout of the current selection, toggle for an optional link (exercises `buildOptional`)
+- [x] Verify SwiftLint covers the example sources or keep them excluded (decision: include `Examples/**/Sources` in linting; regenerate `.swiftlint.yml` includes accordingly)
 
 **Automated Verification**:
-- [ ] `cd Examples/SankeyDemo && xcodegen generate` succeeds
-- [ ] `xcodebuild build -project Examples/SankeyDemo/SankeyDemo.xcodeproj -scheme SankeyDemo -destination 'generic/platform=iOS Simulator'` succeeds
-- [ ] `xcodebuild build -project Examples/SankeyDemo/SankeyDemo.xcodeproj -scheme SankeyDemo -destination 'platform=macOS'` succeeds
-- [ ] `swiftlint --strict` passes
-- [ ] Commit phase result
+- [x] `cd Examples/SankeyDemo && xcodegen generate` succeeds
+- [x] `xcodebuild build -project Examples/SankeyDemo/SankeyDemo.xcodeproj -scheme SankeyDemo -destination 'generic/platform=iOS Simulator'` succeeds
+- [x] `xcodebuild build -project Examples/SankeyDemo/SankeyDemo.xcodeproj -scheme SankeyDemo -destination 'platform=macOS'` succeeds
+- [x] `swiftlint --strict` passes
+- [x] Commit phase result
 
 **Manual Verification**:
-- [ ] Run SankeyDemo on the iOS simulator: all three screens render; Playground sliders animate ribbons live; tapping selects and dims
+- [x] Run SankeyDemo on the iOS simulator: all three screens render; Playground sliders animate ribbons live; tapping selects and dims
 - [ ] Run SankeyDemo on macOS: sidebar navigation works, diagrams render correctly
 
 ### Phase 6: Release Readiness — Docs, CI, GitHub Repo
