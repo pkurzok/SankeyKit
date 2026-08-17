@@ -198,14 +198,14 @@ Dependencies: Phase 1
 The declarative API and a first rendered diagram: container view, result builder, `SankeyLink`/`SankeyNode` marks, both initializers, node rectangles, ribbons, and node labels.
 
 **Tasks**:
-- [ ] `Content/SankeyContent.swift`: `public protocol SankeyContent { func _resolve(into resolution: inout SankeyResolution) }` (doc-commented as not for external conformance); composite types `SankeyTupleContent<each C>` (parameter pack, not N overloads), `SankeyOptionalContent`, `SankeyConditionalContent`, `SankeyForEachContent<Data, C>` (generic over the collection and per-element content), `EmptySankeyContent`, and type-erasing `AnySankeyContent`
-- [ ] `Content/SankeyContentBuilder.swift`: `@resultBuilder public enum SankeyContentBuilder` with `buildBlock` (variadic via `SankeyTupleContent<each C>`), `buildOptional`, `buildEither(first:/second:)`, `buildArray`, `buildExpression`, `buildLimitedAvailability` (returns `AnySankeyContent` to drop the availability-constrained generic)
-- [ ] `Content/SankeyLink.swift`: `public struct SankeyLink: SankeyContent`
+- [x] `Content/SankeyContent.swift`: `public protocol SankeyContent { func _resolve(into resolution: inout SankeyResolution) }` (doc-commented as not for external conformance); composite types `SankeyTupleContent<each C>` (parameter pack, not N overloads), `SankeyOptionalContent`, `SankeyConditionalContent`, `SankeyForEachContent<Data, C>` (generic over the collection and per-element content), `EmptySankeyContent`, and type-erasing `AnySankeyContent`
+- [x] `Content/SankeyContentBuilder.swift`: `@resultBuilder public enum SankeyContentBuilder` with `buildBlock` (variadic via `SankeyTupleContent<each C>`), `buildOptional`, `buildEither(first:/second:)`, `buildArray`, `buildExpression`, `buildLimitedAvailability` (returns `AnySankeyContent` to drop the availability-constrained generic)
+- [x] `Content/SankeyLink.swift`: `public struct SankeyLink: SankeyContent`
   - `init(from: String, to: String, value: Double)`
   - `init(from: SankeyValue<String>, to: SankeyValue<String>, value: SankeyValue<Double>)` (labels retained for accessibility)
   - per-link modifiers returning `Self`: `.foregroundStyle(_ style: some ShapeStyle)` (stored as `AnyShapeStyle`), `.opacity(_ value: Double)`
-- [ ] `Content/SankeyNode.swift`: `public struct SankeyNode: SankeyContent` — `init(_ name: String, layer: Int? = nil)`, modifiers `.foregroundStyle(...)`, `.label(_ text: String)`
-- [ ] `View/SankeyChart.swift`: `public struct SankeyChart<Content: SankeyContent>: View`
+- [x] `Content/SankeyNode.swift`: `public struct SankeyNode: SankeyContent` — `init(_ name: String, layer: Int? = nil)`, modifiers `.foregroundStyle(...)`, `.label(_ text: String)`
+- [x] `View/SankeyChart.swift`: `public struct SankeyChart<Content: SankeyContent>: View`
   - `init(@SankeyContentBuilder content: () -> Content)`
   - data-driven init in an extension, Swift Charts-style, with a *named* generic (an opaque `some SankeyContent` parameter cannot be referenced in a `where` clause):
     ```swift
@@ -218,20 +218,20 @@ The declarative API and a first rendered diagram: container view, result builder
     ```
   - body: resolve content → `SankeyGraph` → `GeometryReader` → `SankeyLayout.compute` → ZStack of ribbon shapes (below) and node shapes + labels (above), `.clipped()`
   - graph error → diagnostic overlay + `os.Logger` error (per Logging section)
-- [ ] `View/RibbonShape.swift`: `Shape` producing the closed ribbon path from `RibbonGeometry` (top curve → line down at target → bottom curve back → close); filled with per-link style or the node color scale color of the *source* node; default link opacity from metrics
-- [ ] `View/NodeShape.swift`: `RoundedRectangle(cornerRadius:)` per node frame + `Text` label — trailing side of node for all layers except the last, which labels on the leading side; label font `.caption`, node color from default palette cycling per node in (layer, y) order
-- [ ] Tests:
+- [x] `View/RibbonShape.swift`: `Shape` producing the closed ribbon path from `RibbonGeometry` (top curve → line down at target → bottom curve back → close); filled with per-link style or the node color scale color of the *source* node; default link opacity from metrics
+- [x] `View/NodeShape.swift`: `RoundedRectangle(cornerRadius:)` per node frame + `Text` label — trailing side of node for all layers except the last, which labels on the leading side; label font `.caption`, node color from default palette cycling per node in (layer, y) order
+- [x] Tests:
   - `ContentBuilderTests`: block with 3 links resolves to 3 resolved links in order; `if` (optional) and `if/else` (either) branches; `for`-loop (`buildArray`); data-driven init flattens collection; `SankeyNode` marks land in overrides, not links
   - Extend `SankeyGraphTests` (Phase 1 file): end-to-end resolution through the builder — marks in a builder closure produce the same graph as hand-built `SankeyResolution`
-- [ ] Add a minimal `#Preview` in `SankeyChart.swift` with the finance example (compiles on all platforms)
+- [x] Add a minimal `#Preview` in `SankeyChart.swift` with the finance example (compiles on all platforms)
 
 **Automated Verification**:
-- [ ] `swift build` succeeds (macOS)
-- [ ] `xcodebuild build -scheme SankeyKit -destination 'generic/platform=iOS Simulator'` succeeds (xcodebuild auto-generates the scheme from `Package.swift`; catches platform-only API misuse)
-- [ ] Same `xcodebuild build` for `generic/platform=tvOS Simulator`, `generic/platform=watchOS Simulator`, and `generic/platform=visionOS Simulator` — all five declared platforms compile
-- [ ] `swift test` passes
-- [ ] `swiftlint --strict` passes
-- [ ] Commit phase result
+- [x] `swift build` succeeds (macOS)
+- [x] `xcodebuild build -scheme SankeyKit -destination 'generic/platform=iOS Simulator'` succeeds (xcodebuild auto-generates the scheme from `Package.swift`; catches platform-only API misuse)
+- [x] Same `xcodebuild build` for `generic/platform=tvOS Simulator`, `generic/platform=watchOS Simulator`, and `generic/platform=visionOS Simulator` — all five declared platforms compile
+- [x] `swift test` passes
+- [x] `swiftlint --strict` passes
+- [x] Commit phase result
 
 **Manual Verification**:
 - [ ] Open the package in Xcode and confirm the `#Preview` renders a correct finance Sankey (proportional ribbons, labels readable, curves bend at node edges without overshoot)
