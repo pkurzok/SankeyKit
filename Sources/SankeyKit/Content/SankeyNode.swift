@@ -29,9 +29,13 @@ public struct SankeyNode: SankeyContent {
     }
 
     /// Fills this node with the given style instead of the color from the chart's color scale.
+    ///
+    /// When the style is a plain `Color`, the ribbons touching this node blend to it as well.
+    /// Any other style paints the node rectangle only, and its ribbons keep the color scale.
     public func foregroundStyle(_ style: some ShapeStyle) -> Self {
         var copy = self
         copy.override.style = AnyShapeStyle(style)
+        copy.override.tint = style as? Color
         return copy
     }
 

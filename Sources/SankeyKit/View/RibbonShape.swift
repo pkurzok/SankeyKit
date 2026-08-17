@@ -9,7 +9,7 @@ struct RibbonShape: Shape {
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        guard geometry.thickness > 0 || geometry.start != geometry.end else { return path }
+        guard geometry.startThickness > 0 || geometry.endThickness > 0 else { return path }
 
         let top = geometry.topCurve
         let bottom = geometry.bottomCurve

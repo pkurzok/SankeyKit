@@ -8,9 +8,16 @@ struct RibbonGeometryTests {
         from start: CGPoint,
         to end: CGPoint,
         thickness: CGFloat = 10,
+        endThickness: CGFloat? = nil,
         curvature: Double = 0.5
     ) -> RibbonGeometry {
-        RibbonGeometry(start: start, end: end, thickness: thickness, curvature: curvature)
+        RibbonGeometry(
+            start: start,
+            end: end,
+            startThickness: thickness,
+            endThickness: endThickness ?? thickness,
+            curvature: curvature
+        )
     }
 
     @Test("Control points follow the article formula")
@@ -66,12 +73,28 @@ struct RibbonGeometryTests {
         #expect(geometry.bottomCurve.control2.y - geometry.topCurve.control2.y == 20)
     }
 
-    @Test("A ribbon exposes nine animatable components")
+    @Test("A ribbon exposes ten animatable components")
     func animatableComponents() {
-        let geometry = ribbon(from: CGPoint(x: 1, y: 2), to: CGPoint(x: 101, y: 42), thickness: 7)
+        let geometry = ribbon(from: CGPoint(x: 1, y: 2), to: CGPoint(x: 101, y: 42), thickness: 7, endThickness: 9)
         let components = geometry.animatableComponents
-        #expect(components.count == 9)
+        #expect(components.count == 10)
         #expect(components.first == 1)
-        #expect(components.last == 7)
+        #expect(components.suffix(2) == [7, 9])
+    }
+
+    @Test("A tapering ribbon offsets each end by its own half thickness")
+    func taperingEnds() {
+        let geometry = ribbon(
+            from: CGPoint(x: 0, y: 50),
+            to: CGPoint(x: 100, y: 50),
+            thickness: 20,
+            endThickness: 10
+        )
+        #expect(geometry.topCurve.start.y == 40)
+        #expect(geometry.topCurve.control1.y == 40)
+        #expect(geometry.topCurve.control2.y == 45)
+        #expect(geometry.topCurve.end.y == 45)
+        #expect(geometry.bottomCurve.start.y == 60)
+        #expect(geometry.bottomCurve.end.y == 55)
     }
 }

@@ -49,13 +49,15 @@ struct AnimatableVectorTests {
         let start = RibbonGeometry(
             start: CGPoint(x: 0, y: 0),
             end: CGPoint(x: 100, y: 0),
-            thickness: 10,
+            startThickness: 10,
+            endThickness: 10,
             curvature: 0.5
         )
         let end = RibbonGeometry(
             start: CGPoint(x: 0, y: 40),
             end: CGPoint(x: 100, y: 80),
-            thickness: 30,
+            startThickness: 30,
+            endThickness: 30,
             curvature: 0.5
         )
         var midpoint = AnimatableVector(start.animatableComponents)
