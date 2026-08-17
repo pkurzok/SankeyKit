@@ -323,26 +323,32 @@ Dependencies: Phase 5
 DocC catalog, detailed README, license, CI workflow, and the private GitHub repository.
 
 **Tasks**:
-- [ ] `Sources/SankeyKit/Documentation.docc/SankeyKit.md`: landing page — overview, feature list, curated topics (Essentials / Marks / Styling / Interaction)
-- [ ] `Sources/SankeyKit/Documentation.docc/GettingStarted.md`: article building the finance example step by step
-- [ ] Audit all public symbols for `///` doc comments (every public type, init, and modifier)
-- [ ] `LICENSE`: MIT, copyright 2026 Peter Kurzok
-- [ ] `README.md` (detailed, public-ready): what it is + hero code sample; feature list; requirements (platforms/Swift); SPM installation (`.package(url:)` snippet); usage — explicit marks, data-driven init, styling modifiers table, selection, animation; sample app instructions (`xcodegen generate` + open); architecture note (pure layout engine); license & credits (link to the jc_builds article for the ribbon math); CI badge
-- [ ] `.github/workflows/ci.yml`: on push/PR to `main`; jobs on `macos-latest`: **lint** (`brew install swiftlint && swiftlint --strict`), **test** (select newest Xcode via `xcode-select`, `swift build`, `swift test`)
-- [ ] Verify DocC builds: `swift package generate-documentation --target SankeyKit` (plugin dependency added in Phase 1)
-- [ ] Create repo & push: `gh repo create pkurzok/SankeyKit --private --source . --description "Swift Charts-style Sankey diagrams for SwiftUI" --push`
+- [x] `Sources/SankeyKit/Documentation.docc/SankeyKit.md`: landing page — overview, feature list, curated topics (Essentials / Marks / Styling / Interaction)
+- [x] `Sources/SankeyKit/Documentation.docc/GettingStarted.md`: article building the finance example step by step
+- [x] Audit all public symbols for `///` doc comments (every public type, init, and modifier)
+- [x] `LICENSE`: MIT, copyright 2026 Peter Kurzok
+- [x] `README.md` (detailed, public-ready): what it is + hero code sample; feature list; requirements (platforms/Swift); SPM installation (`.package(url:)` snippet); usage — explicit marks, data-driven init, styling modifiers table, selection, animation; sample app instructions (`xcodegen generate` + open); architecture note (pure layout engine); license & credits (link to the jc_builds article for the ribbon math); CI badge
+- [x] `.github/workflows/ci.yml`: on push/PR to `main`; jobs on `macos-latest`: **lint** (`brew install swiftlint && swiftlint --strict`), **test** (select newest Xcode via `xcode-select`, `swift build`, `swift test`)
+- [x] Verify DocC builds: `swift package generate-documentation --target SankeyKit` (plugin dependency added in Phase 1)
+- [ ] **BLOCKED — needs your go-ahead.** Create repo & push: `gh repo create pkurzok/SankeyKit --private --source . --description "Swift Charts-style Sankey diagrams for SwiftUI" --push`
 - [ ] Confirm CI run is green on GitHub: `gh run list --limit 1` shows status `completed` / conclusion `success`
 - [ ] Update this plan's frontmatter `status` to `complete` and record any deviations in Implementation Notes
 
 **Automated Verification**:
-- [ ] `swift package generate-documentation --target SankeyKit` succeeds
-- [ ] `swift build` && `swift test` && `swiftlint --strict` pass locally
+- [x] `swift package generate-documentation --target SankeyKit` succeeds
+- [x] `swift build` && `swift test` && `swiftlint --strict` pass locally
 - [ ] `gh repo view pkurzok/SankeyKit --json visibility` reports `PRIVATE`
 - [ ] `gh run list --limit 1` shows a successful CI run
 
 **Manual Verification**:
 - [ ] README renders correctly on GitHub (code blocks, badge, tables)
 - [ ] DocC documentation browsable in Xcode (Product → Build Documentation)
+
+### Phase 6 status
+
+Everything local is done and green. The only outstanding items are the three that need the network:
+creating `pkurzok/SankeyKit`, pushing, and confirming the first CI run. The `gh repo create` call
+was denied by the sandbox classifier and needs the user to run it or grant permission.
 
 ## Implementation Notes
 
