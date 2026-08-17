@@ -49,6 +49,45 @@ struct SankeyLayoutTests {
         #expect(result.layerCount == 3)
     }
 
+    @Test("A horizontal inset keeps the outer columns clear of the edges")
+    func horizontalInsetReservesLabelRoom() throws {
+        let metrics = SankeyMetrics(nodeWidth: 12)
+        let result = SankeyLayout.compute(
+            graph: try graph([link("A", "B", 1), link("B", "C", 1)]),
+            size: size,
+            metrics: metrics,
+            horizontalInset: 60
+        )
+        #expect(try #require(result.nodeFrames["A"]).minX == 60)
+        #expect(try #require(result.nodeFrames["C"]).maxX == size.width - 60)
+        #expect(try #require(result.nodeFrames["B"]).midX == size.width / 2)
+    }
+
+    @Test("An oversized inset is clamped so the diagram keeps half of the width")
+    func horizontalInsetIsClamped() throws {
+        let result = SankeyLayout.compute(
+            graph: try graph([link("A", "B", 1)]),
+            size: size,
+            metrics: SankeyMetrics(nodeWidth: 12),
+            horizontalInset: size.width
+        )
+        let frameA = try #require(result.nodeFrames["A"])
+        let frameB = try #require(result.nodeFrames["B"])
+        #expect(frameA.minX == size.width / 4)
+        #expect(frameB.maxX == size.width * 3 / 4)
+        #expect(frameB.minX > frameA.maxX)
+    }
+
+    @Test("A negative inset is treated as none")
+    func negativeInset() throws {
+        let result = SankeyLayout.compute(
+            graph: try graph([link("A", "B", 1)]),
+            size: size,
+            horizontalInset: -50
+        )
+        #expect(try #require(result.nodeFrames["A"]).minX == 0)
+    }
+
     @Test("A node override without any link produces an empty layout")
     func nodeOverrideWithoutLinks() throws {
         var resolution = SankeyResolution()

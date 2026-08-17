@@ -194,3 +194,75 @@ struct MetricsTests {
         #expect(try #require(result.links.first).geometry.curvature == metrics.curvature)
     }
 }
+
+@Suite("Label placement")
+struct LabelPlacementTests {
+    private func nodes(_ links: [ResolvedLink]) throws -> [LaidOutNode] {
+        SankeyLayout.compute(
+            graph: try graph(links),
+            size: CGSize(width: 400, height: 200)
+        ).nodes
+    }
+
+    @Test("The first column reads outward left and the last outward right")
+    func outerColumnsReadOutward() throws {
+        let laidOut = try nodes([link("A", "B", 1), link("B", "C", 1)])
+        let placements = laidOut.map { LabelLayer.placement(for: $0, layerCount: 3) }
+        #expect(placements == [.leading, .over, .trailing])
+    }
+
+    @Test("With only two columns no label sits on a node")
+    func twoColumnsHaveNoInnerLabels() throws {
+        let laidOut = try nodes([link("A", "B", 1)])
+        let placements = laidOut.map { LabelLayer.placement(for: $0, layerCount: 2) }
+        #expect(placements == [.leading, .trailing])
+    }
+
+    @Test("Every column in between sits on its own node")
+    func innerColumnsSitOnTheNode() throws {
+        let laidOut = try nodes([
+            link("A", "B", 1),
+            link("B", "C", 1),
+            link("C", "D", 1),
+            link("D", "E", 1)
+        ])
+        let placements = laidOut.map { LabelLayer.placement(for: $0, layerCount: 5) }
+        #expect(placements == [.leading, .over, .over, .over, .trailing])
+    }
+
+    @Test("The reserved label margin has a floor, a ceiling, and never takes the canvas over")
+    func labelInsetScalesWithWidth() {
+        // Phone width: the floor applies, and it stays well under the share-of-width cap.
+        #expect(SankeyDiagram.labelInset(for: CGSize(width: 400, height: 200)) == 64)
+        // Desktop width: proportional.
+        #expect(SankeyDiagram.labelInset(for: CGSize(width: 900, height: 400)) == 108)
+        // Very wide: capped, so a wide chart does not waste its width on margins.
+        #expect(SankeyDiagram.labelInset(for: CGSize(width: 2000, height: 400)) == 140)
+        // Very narrow: the share-of-width cap wins over the floor, leaving a diagram in the middle.
+        #expect(SankeyDiagram.labelInset(for: CGSize(width: 180, height: 180)) == 180 * 0.22)
+        #expect(SankeyDiagram.labelInset(for: .zero) == 0)
+    }
+
+    @Test("The diagram always keeps more than half of the width", arguments: [
+        CGFloat(120), 180, 320, 400, 900, 2000
+    ])
+    func diagramKeepsMostOfTheWidth(width: CGFloat) {
+        let inset = SankeyDiagram.labelInset(for: CGSize(width: width, height: 200))
+        #expect(inset * 2 < width * 0.5)
+    }
+
+    @Test("A label between the columns never spills past its neighbours")
+    func innerSlotWidthIsBounded() {
+        let size = CGSize(width: 600, height: 200)
+        let inset = SankeyDiagram.labelInset(for: size)
+        let width = SankeyDiagram.innerSlotWidth(
+            size: size,
+            inset: inset,
+            layerCount: 3,
+            metrics: .default
+        )
+        let stride = (size.width - 2 * inset - SankeyMetrics.default.nodeWidth) / 2
+        #expect(width <= stride)
+        #expect(width >= 32)
+    }
+}

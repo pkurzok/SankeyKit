@@ -4,6 +4,8 @@ Sankey diagrams for SwiftUI, written the way you write a Swift Chart.
 
 ## Overview
 
+@Image(source: "sankey-hero", alt: "A Sankey diagram of a monthly budget: Salary and Side gig flow into Monthly Budget, which flows out to Rent, Groceries and Savings.")
+
 A Sankey diagram shows how a quantity splits and recombines on its way from left to right: where
 a salary goes, how primary energy reaches a socket, where visitors drop out of a funnel. SankeyKit
 draws one from a description of the flows alone.
@@ -23,7 +25,9 @@ follows from the flows that touch it, and its column follows from the direction 
 it sits in.
 
 Ribbons blend from the color of the node they leave to the color of the node they enter, so a
-single flow reads as one continuous band all the way across the diagram.
+single flow reads as one continuous band all the way across the diagram. Labels place themselves:
+the first column reads outward to the left, the last outward to the right, and any column in
+between sits on its own node.
 
 ### What you get
 
