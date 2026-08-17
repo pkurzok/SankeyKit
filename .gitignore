@@ -1,0 +1,8 @@
+.build/
+DerivedData/
+xcuserdata/
+Examples/**/*.xcodeproj
+.DS_Store
+.swiftpm/
+Package.resolved
+*.xcworkspace/xcuserdata/
