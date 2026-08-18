@@ -1,8 +1,13 @@
 # Feedback Assistant draft — iOS 27: Toggle drops the transaction from `Binding.animation(_:)`
 
-Submit at <https://feedbackassistant.apple.com>. Attach
-`ToggleBindingAnimationRepro.swift` (this directory) — or a scratch app containing it — plus a
-screen recording of the iOS 27 run.
+Submit at <https://feedbackassistant.apple.com>.
+
+Sample project (ready to clone and open, no dependencies):
+<https://github.com/pkurzok/ios27-toggle-animation-repro>
+
+Attach a zip of that repository — Feedback Assistant does not follow links — plus a screen
+recording of the iOS 27 run. `ToggleBindingAnimationRepro.swift` in this directory is the same
+file, if a single source file is preferred over a project.
 
 - **Area:** SwiftUI
 - **Type:** Incorrect/Unexpected Behavior
@@ -32,23 +37,25 @@ The same code animates correctly on iOS 26.5 and on macOS, so this is a regressi
 
 ## Steps to Reproduce
 
-1. Create a new iOS App (SwiftUI) project in Xcode 27.0 (27A5237l).
-2. Add the attached `ToggleBindingAnimationRepro.swift` and make `ReproView` the root view.
-3. Run on the iOS 27.0 simulator (iPhone 17, runtime 24A5408d).
-4. Tap the first toggle, labelled "Binding.animation (broken on iOS 27)".
-5. Tap the button and the second toggle, which flip the same state through
+1. Open `ReproApp.xcodeproj` from the attached sample project in Xcode 27.0 (27A5237l).
+   (Equivalently: create a new iOS App (SwiftUI) project, add
+   `Sources/ToggleBindingAnimationRepro.swift`, and make `ReproView` the root view.)
+2. Run on the iOS 27.0 simulator (iPhone 17, runtime 24A5408d).
+3. Tap the first toggle, labelled "Binding.animation (broken on iOS 27)".
+4. Tap the button and the second toggle, which flip the same state through
    `withAnimation` instead.
+5. Run the same build on an iOS 26.5 simulator and repeat steps 3 and 4.
 
 ## Expected Results
 
-In step 4, the bars resize and the extra bar inserts over roughly 0.3 s, the same as in step 5 and
-the same as on iOS 26.5.
+In step 3, the bars resize and the extra bar inserts over roughly 0.3 s, the same as in step 4 and
+the same as on iOS 26.5 in step 5.
 
 ## Actual Results
 
-In step 4 the switch thumb animates but the bars change in a single frame — no interpolation. In
-step 5 both controls animate as expected on the same run, so the difference is the write path, not
-the view hierarchy.
+In step 3 the switch thumb animates but the bars change in a single frame — no interpolation. In
+step 4 both controls animate as expected on the same run, so the difference is the write path, not
+the view hierarchy. In step 5 all three controls animate.
 
 ## Environment
 
@@ -66,3 +73,8 @@ the current and the preceding commit of the affected project, ruling out an app-
 
 A behaviourally analogous regression (`Form` row animations) appeared in the iOS 26 beta 3 seed and
 was fixed one beta later: <https://developer.apple.com/forums/thread/793278>
+
+## Links
+
+- Sample project: <https://github.com/pkurzok/ios27-toggle-animation-repro>
+- Project where this surfaced: <https://github.com/pkurzok/SankeyKit>
