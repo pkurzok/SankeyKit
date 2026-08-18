@@ -49,7 +49,7 @@ all the way across.
 - **Animation.** Change a value inside `withAnimation` and the ribbons morph rather than jump.
 - **Accessibility.** Every node and every ribbon is its own element, read in column order.
 - **A pure layout engine.** The geometry is a value-type computation with no view dependencies,
-  covered by 100 unit tests.
+  covered by 112 unit tests.
 
 ## Requirements
 
@@ -62,7 +62,8 @@ all the way across.
 | watchOS | 10.0 |
 | visionOS | 1.0 |
 
-Selection needs a tap, so on tvOS the diagram is read-only.
+Selection is driven by taps and by accessibility activation. tvOS has no pointer, so there a
+chart is selectable through VoiceOver but not by remote alone.
 
 ## Installation
 
@@ -234,12 +235,18 @@ swiftlint --strict
 swift package generate-documentation --target SankeyKit
 ```
 
+Branch from `main` and open a pull request — see [CONTRIBUTING.md](CONTRIBUTING.md). Released
+versions are listed in [CHANGELOG.md](CHANGELOG.md).
+
 ## Credits
 
-The ribbon math — a single cubic Bézier per edge with control points offset in both axes — follows
+Column assignment and ribbon geometry both follow
+[d3-sankey](https://github.com/d3/d3-sankey): columns via longest-path layering, and each ribbon a
+cubic Bézier whose control points sit on the horizontal midpoint — `d3-shape`'s `bumpX` curve.
+
+The first version of this package took its approach from
 [Easily add a clean SwiftUI Sankey diagram to your app](https://medium.com/@jc_builds/easily-add-a-clean-swiftui-sankey-diagram-to-your-app-c4972b55d0c1)
-by jc_builds. Column assignment follows the longest-path layering used by
-[d3-sankey](https://github.com/d3/d3-sankey).
+by jc_builds.
 
 ## License
 

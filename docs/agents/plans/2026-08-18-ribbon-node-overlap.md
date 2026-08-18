@@ -1,6 +1,6 @@
 ---
 date: 2026-08-18T07:23:57+00:00
-git_commit: 96546264cc13440c8a6b0404ca1d24169a6a656d
+git_commit: ""
 branch: curved-ribbons
 topic: "Tuck ribbon ends under the node capsules"
 tags: [plan, ribbon-shape, sankey-diagram, rendering]

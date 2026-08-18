@@ -39,3 +39,22 @@ jobs:
 
       - name: Test
         run: swift test
+
+  platforms:
+    name: Build (${{ matrix.platform }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false          # one broken platform must not hide the others
+      matrix:
+        platform: [iOS, macOS, tvOS, watchOS, visionOS]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)"
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -scheme SankeyKit \
+            -destination "generic/platform=${{ matrix.platform }}"
