@@ -331,7 +331,7 @@ Prove the README's platform table on the GitHub runner, then make `Package.swift
 agree with whatever the runner reports.
 
 **Tasks**:
-- [-] Add a `platforms` job to `.github/workflows/ci.yml`:
+- [x] Add a `platforms` job to `.github/workflows/ci.yml`:
 
       ```yaml
         platforms:
@@ -352,7 +352,7 @@ agree with whatever the runner reports.
                   -destination "generic/platform=${{ matrix.platform }}"
       ```
 
-- [ ] Push and read every matrix leg's result
+- [-] Push and read every matrix leg's result
 - [ ] If a leg fails with *"<platform> … is not installed"* rather than a compile error, the runner
       is missing the SDK, not the code: add
       `xcodebuild -downloadPlatform ${{ matrix.platform }}` as a step before the build and re-run.
@@ -369,7 +369,7 @@ agree with whatever the runner reports.
 
 **Automated Verification**:
 - [ ] `gh pr checks` reports every job passing, including all five (or all remaining) matrix legs
-- [ ] The platform list in `Package.swift` matches the README requirements table:
+- [x] The platform list in `Package.swift` matches the README requirements table:
       `swift package dump-package | jq -r '.platforms[].platformName' | sort` lines up with the
       table rows in `README.md`
 - [ ] `swift build`, `swift test` and `swiftlint --strict` still pass after any platform fix
