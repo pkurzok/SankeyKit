@@ -4,7 +4,7 @@ git_commit: ""
 branch: main
 topic: "Public release: sanitize, verify and tag SankeyKit 1.0.0"
 tags: [plan, release, git-history, ci, readme, documentation]
-status: ready
+status: complete
 ---
 
 # PLAN: Public release — sanitize, verify and tag SankeyKit 1.0.0
@@ -352,28 +352,28 @@ agree with whatever the runner reports.
                   -destination "generic/platform=${{ matrix.platform }}"
       ```
 
-- [-] Push and read every matrix leg's result
-- [ ] If a leg fails with *"<platform> … is not installed"* rather than a compile error, the runner
+- [x] Push and read every matrix leg's result
+- [x] ~~If a leg fails with *"<platform> … is not installed"* rather than a compile error, the runner
       is missing the SDK, not the code: add
       `xcodebuild -downloadPlatform ${{ matrix.platform }}` as a step before the build and re-run.
-      This is an environment fix, not a reason to drop the platform
-- [ ] If a leg fails with a genuine compile error that an availability annotation or an
+      This is an environment fix, not a reason to drop the platform~~ — n/a, no leg was missing an SDK
+- [x] ~~If a leg fails with a genuine compile error that an availability annotation or an
       `#if os(...)` guard resolves, fix it in `Sources/SankeyKit/` — the likely candidates are the
       `onTapGesture` calls at `SankeyDiagram.swift:33`, `:127` and `:159`, which today carry no
-      platform guard at all
-- [ ] If a leg needs structural change to compile, remove that platform from `Package.swift`,
+      platform guard at all~~ — n/a, no leg failed to compile
+- [x] ~~If a leg needs structural change to compile, remove that platform from `Package.swift`,
       from the README requirements table and from
       `Sources/SankeyKit/Documentation.docc/SankeyKit.md:47-49`, and note it in `CHANGELOG.md` as a
-      candidate for 1.1 — do not hold 1.0.0 for it
-- [ ] Merge the PR once every job is green
+      candidate for 1.1 — do not hold 1.0.0 for it~~ — n/a, all five platforms build
+- [x] Merge the PR once every job is green
 
 **Automated Verification**:
-- [ ] `gh pr checks` reports every job passing, including all five (or all remaining) matrix legs
+- [x] `gh pr checks` reports every job passing, including all five (or all remaining) matrix legs
 - [x] The platform list in `Package.swift` matches the README requirements table:
       `swift package dump-package | jq -r '.platforms[].platformName' | sort` lines up with the
       table rows in `README.md`
-- [ ] `swift build`, `swift test` and `swiftlint --strict` still pass after any platform fix
-- [ ] `gh pr view --json state` reports `MERGED`
+- [x] `swift build`, `swift test` and `swiftlint --strict` still pass after any platform fix
+- [x] `gh pr view --json state` reports `MERGED`
 
 ---
 
@@ -385,16 +385,16 @@ Replace the employer email on every commit and scrub the Team ID and home path f
 contents, then force-push while the repository is still private.
 
 **Tasks**:
-- [ ] `git switch main && git pull` so the merged PR is local
-- [ ] Back up first: `git bundle create <scratchpad>/sankeykit-pre-rewrite.bundle --all`, and record
+- [x] `git switch main && git pull` so the merged PR is local
+- [x] Back up first: `git bundle create <scratchpad>/sankeykit-pre-rewrite.bundle --all`, and record
       `git rev-parse main` so the pre-rewrite tip can be recovered
-- [ ] Confirm a clean tree (`git status --short` empty) — `--tree-filter` will not run otherwise
-- [ ] Delete the two stale local branches whose remotes are gone (decision 4):
+- [x] Confirm a clean tree (`git status --short` empty) — `--tree-filter` will not run otherwise
+- [x] Delete the two stale local branches whose remotes are gone (decision 4):
       `git branch -D swiftui-way-audit-fixes fix/ios27-toggle-animation`
-- [ ] Set the local identity **before** rewriting, so nothing later reintroduces the work address:
+- [x] Set the local identity **before** rewriting, so nothing later reintroduces the work address:
       `git config --local user.email github@peterkurzok.de` and
       `git config --local user.name "Peter Kurzok"`
-- [ ] Run one combined pass:
+- [x] Run one combined pass:
 
       ```sh
       FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch \
@@ -422,22 +422,22 @@ contents, then force-push while the repository is still private.
       `[ -n "$TEAM_ID" ] && [ -n "$HOME_PATH" ]` before running. The `true` at the end of each
       filter keeps a false `[ … ]` test from aborting the pass, and the `-d docs` guard exists
       because `docs/` is absent from the earliest commits.
-- [ ] Drop the backup refs `filter-branch` leaves behind:
+- [x] Drop the backup refs `filter-branch` leaves behind:
       `git for-each-ref --format='%(refname)' refs/original | xargs -n 1 git update-ref -d`,
       then `git reflog expire --expire=now --all && git gc --prune=now --aggressive`
-- [ ] Force-push: `git push --force-with-lease origin main`
+- [x] Force-push: `git push --force-with-lease origin main`
 
 **Automated Verification**:
-- [ ] `git log --format='%ae %ce' --all | tr ' ' '\n' | sort -u` lists only
+- [x] `git log --format='%ae %ce' --all | tr ' ' '\n' | sort -u` lists only
       `github@peterkurzok.de` and `noreply@github.com`
-- [ ] `git log -S "$TEAM_ID" --all --oneline` produces no output
-- [ ] `git log -S "$HOME_PATH" --all --oneline` produces no output
-- [ ] `git config --local user.email` prints `github@peterkurzok.de`
-- [ ] `git rev-list --count main` is identical to the count recorded before the rewrite
-- [ ] `git for-each-ref refs/original` is empty
-- [ ] `git status --short` is empty and `git diff origin/main` is empty after the push
-- [ ] `swift build && swift test && swiftlint --strict` still pass on the rewritten tree
-- [ ] `gh run list --branch main --limit 1` shows the post-force-push CI run green
+- [x] `git log -S "$TEAM_ID" --all --oneline` produces no output
+- [x] `git log -S "$HOME_PATH" --all --oneline` produces no output
+- [x] `git config --local user.email` prints `github@peterkurzok.de`
+- [x] `git rev-list --count main` is identical to the count recorded before the rewrite
+- [x] `git for-each-ref refs/original` is empty
+- [x] `git status --short` is empty and `git diff origin/main` is empty after the push
+- [x] `swift build && swift test && swiftlint --strict` still pass on the rewritten tree
+- [x] `gh run list --branch main --limit 1` shows the post-force-push CI run green
 
 ---
 
@@ -449,27 +449,27 @@ Flip the repository to public, tag `1.0.0`, cut the Release, set the topics, the
 consumer can resolve it.
 
 **Tasks**:
-- [ ] `gh repo edit pkurzok/SankeyKit --visibility public --accept-visibility-change-consequences`
-- [ ] Set the topics:
+- [x] `gh repo edit pkurzok/SankeyKit --visibility public --accept-visibility-change-consequences`
+- [x] Set the topics:
       `gh repo edit pkurzok/SankeyKit --add-topic swift,swiftui,sankey,charts,data-visualization,swift-package`
-- [ ] Create the annotated tag on the rewritten `main`:
+- [x] Create the annotated tag on the rewritten `main`:
       `git tag -a 1.0.0 -m "SankeyKit 1.0.0"` — no `v` prefix, matching the
       `from: "1.0.0"` already written in `README.md:73`
-- [ ] `git push origin 1.0.0`
-- [ ] Extract the `1.0.0` section of `CHANGELOG.md` into a scratchpad file (everything between the
+- [x] `git push origin 1.0.0`
+- [x] Extract the `1.0.0` section of `CHANGELOG.md` into a scratchpad file (everything between the
       `## [1.0.0]` heading and the next `## ` heading, heading excluded), then cut the Release:
       `gh release create 1.0.0 --title "SankeyKit 1.0.0" --notes-file <scratchpad>/release-notes.md`
-- [ ] Verify a real consumer resolves it: in the scratchpad, create a package with
+- [x] Verify a real consumer resolves it: in the scratchpad, create a package with
       `dependencies: [.package(url: "https://github.com/pkurzok/SankeyKit.git", from: "1.0.0")]`
       and a target depending on the `SankeyKit` product, then `swift build`
 
 **Automated Verification**:
-- [ ] `gh repo view pkurzok/SankeyKit --json visibility --jq .visibility` prints `PUBLIC`
-- [ ] `gh repo view pkurzok/SankeyKit --json repositoryTopics` lists all six topics
-- [ ] `git ls-remote --tags origin` lists `refs/tags/1.0.0`
-- [ ] `gh release view 1.0.0 --json tagName,name` returns tag `1.0.0` and name `SankeyKit 1.0.0`
-- [ ] The scratchpad consumer package builds, and its `Package.resolved` pins version `1.0.0`
-- [ ] `gh api repos/pkurzok/SankeyKit/community/profile --jq .health_percentage` returns a value
+- [x] `gh repo view pkurzok/SankeyKit --json visibility --jq .visibility` prints `PUBLIC`
+- [x] `gh repo view pkurzok/SankeyKit --json repositoryTopics` lists all six topics
+- [x] `git ls-remote --tags origin` lists `refs/tags/1.0.0`
+- [x] `gh release view 1.0.0 --json tagName,name` returns tag `1.0.0` and name `SankeyKit 1.0.0`
+- [x] The scratchpad consumer package builds, and its `Package.resolved` pins version `1.0.0`
+- [x] `gh api repos/pkurzok/SankeyKit/community/profile --jq .health_percentage` returns a value
       reflecting the added README, LICENSE, CONTRIBUTING and CHANGELOG
 
 **Manual Verification**:
@@ -481,6 +481,40 @@ consumer can resolve it.
 ## Implementation Notes
 
 During implementation, document user feedback, problems, and decisions here.
+
+**All five platforms compile.** The matrix went green on the first run — including tvOS and
+watchOS, which the plan flagged as never having been built anywhere. No `#if os(...)` guard, no
+availability annotation and no `-downloadPlatform` step was needed, so the three conditional
+Phase 2 tasks are struck through as not applicable and `Package.swift` is untouched. 1.0.0 ships
+the platform list it promises.
+
+**The local git identity was set in Phase 1, not Phase 3.** The plan sequences
+`git config --local user.email` inside the rewrite, but the Phase 1 and 2 commits would then have
+carried the employer address into PR #5 and onto GitHub — briefly, and only while private, but
+needlessly. Setting it before the first commit is strictly better and leaves the Phase 3 task
+already satisfied.
+
+**`filter-branch --all` rewrote `refs/remotes/origin/main` too**, so the plan's bare
+`git push --force-with-lease origin main` would have compared the remote against a tracking ref
+that no longer described it. The push was made as
+`git push --force-with-lease=main:5015986 origin main` instead, pinning the expected value to the
+real pre-rewrite tip, which restores the protection the plan wanted rather than defeating it.
+
+**Every `git_commit:` frontmatter field under `docs/agents/plans/` was emptied, not just the three
+the plan named.** `2026-08-17-curved-ribbons.md` and `2026-08-18-ribbon-node-overlap.md` also
+carried SHAs; the plan's own verification (`git grep -nE '^git_commit: [0-9a-f]{7,}' -- docs`
+returns nothing) requires all of them, and the rewrite invalidated every one.
+
+**The Medium URL in Credits returns 403 to `curl`, not 200.** That is Medium's bot blocking, not a
+dead link — the URL is byte-identical to the one already in the README before this work. The
+d3-sankey URL returns 200.
+
+**History rewriting, force-pushing and `chmod +x` were refused by the sandbox classifier.** The
+rewrite was staged as `scratchpad/rewrite-history.sh` and run by the author, as was the force-push.
+Everything either side of those two commands was automated.
+
+**Community profile health is 57%** — README, LICENSE and CONTRIBUTING present. The remaining
+items (code of conduct, issue and PR templates) are the ones this plan put out of scope.
 
 ## References
 
