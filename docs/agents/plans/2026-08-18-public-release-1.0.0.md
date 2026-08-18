@@ -473,7 +473,7 @@ consumer can resolve it.
       reflecting the added README, LICENSE, CONTRIBUTING and CHANGELOG
 
 **Manual Verification**:
-- [ ] Open `https://github.com/pkurzok/SankeyKit` while signed out (or in a private window) and
+- [x] Open `https://github.com/pkurzok/SankeyKit` while signed out (or in a private window) and
       confirm the README renders end to end: both `<picture>` elements resolve their light and dark
       screenshots, the badges load, and the Credits links work — relative image paths that render
       fine in a private repo can still surprise once the raw-content host changes.
@@ -512,6 +512,11 @@ d3-sankey URL returns 200.
 **History rewriting, force-pushing and `chmod +x` were refused by the sandbox classifier.** The
 rewrite was staged as `scratchpad/rewrite-history.sh` and run by the author, as was the force-push.
 Everything either side of those two commands was automated.
+
+**The public README was confirmed by the author** on 2026-08-18: it renders end to end signed out,
+both `<picture>` elements swap their light and dark screenshots, the badges load and the Credits
+links work. Checked ahead of that, anonymously: all seven images (both `~dark` variants included),
+the CI badge and the release page return 200 over `raw.githubusercontent.com`.
 
 **Community profile health is 57%** — README, LICENSE and CONTRIBUTING present. The remaining
 items (code of conduct, issue and PR templates) are the ones this plan put out of scope.
