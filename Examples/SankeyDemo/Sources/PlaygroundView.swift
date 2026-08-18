@@ -26,11 +26,11 @@ struct PlaygroundView: View {
             .sankeyNodeCornerRadius(4)
         } controls: {
             VStack(alignment: .leading, spacing: 12) {
-                selectionReadout
+                SelectionReadout(selection: $selection)
 
-                valueSlider("Rent", value: $rent, range: 400...3000)
-                valueSlider("Groceries", value: $groceries, range: 100...2000)
-                valueSlider("Savings", value: $savings, range: 100...3000)
+                ValueSlider("Rent", value: $rent, range: 400...3000)
+                ValueSlider("Groceries", value: $groceries, range: 100...2000)
+                ValueSlider("Savings", value: $savings, range: 100...3000)
 
                 Toggle("Side gig", isOn: $showsSideGig.animation(.snappy))
                     .toggleStyle(.switch)
@@ -46,8 +46,20 @@ struct PlaygroundView: View {
         }
     }
 
-    @ViewBuilder
-    private var selectionReadout: some View {
+    private var caption: String {
+        """
+        Everything at once: the sliders write the link values through an animated binding so the \
+        ribbons morph rather than jump, the toggle adds and removes a mark, and tapping a node or \
+        a flow keeps it and its neighbours lit while the rest dims.
+        """
+    }
+}
+
+/// What is selected right now, with a way to clear it.
+private struct SelectionReadout: View {
+    @Binding var selection: SankeySelection?
+
+    var body: some View {
         let text: String = switch selection {
         case nil: "Nothing selected — tap a node or a flow"
         case .node(let name): "Node: \(name)"
@@ -66,35 +78,33 @@ struct PlaygroundView: View {
         }
         .animation(.snappy, value: selection)
     }
+}
 
-    /// A slider that animates the diagram while it is being dragged.
-    private func valueSlider(
-        _ title: String,
-        value: Binding<Double>,
-        range: ClosedRange<Double>
-    ) -> some View {
-        let animated = Binding(
-            get: { value.wrappedValue },
-            set: { newValue in withAnimation(.smooth(duration: 0.2)) { value.wrappedValue = newValue } }
-        )
+/// A labelled slider that animates the diagram while it is being dragged.
+///
+/// The animation rides on the binding rather than on a `withAnimation` in a setter, so every write
+/// the slider makes — drag or keyboard — morphs the ribbons instead of jumping.
+private struct ValueSlider: View {
+    var title: String
+    @Binding var value: Double
+    var range: ClosedRange<Double>
 
-        return HStack(spacing: 12) {
+    init(_ title: String, value: Binding<Double>, range: ClosedRange<Double>) {
+        self.title = title
+        self._value = value
+        self.range = range
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
             Text(title)
                 .font(.caption)
                 .frame(width: 78, alignment: .leading)
-            Slider(value: animated, in: range)
-            Text(value.wrappedValue.formatted(.number.precision(.fractionLength(0))))
+            Slider(value: $value.animation(.smooth(duration: 0.2)), in: range)
+            Text(value.formatted(.number.precision(.fractionLength(0))))
                 .font(.caption.monospacedDigit())
                 .frame(width: 48, alignment: .trailing)
         }
-    }
-
-    private var caption: String {
-        """
-        Everything at once: sliders change the link values inside withAnimation so the ribbons \
-        morph rather than jump, the toggle adds and removes a mark, and tapping a node or a flow \
-        keeps it and its neighbours lit while the rest dims.
-        """
     }
 }
 

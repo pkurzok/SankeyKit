@@ -130,7 +130,9 @@ private struct RibbonLayer: View {
                     from: source,
                     to: target,
                     isSelected: selection?.wrappedValue == value,
-                    sortPriority: -1
+                    sortPriority: -1,
+                    // The same toggle the tap gesture runs, so the two cannot drift apart.
+                    selectAction: selection == nil ? nil : { SankeyDiagram.toggle(value, in: selection) }
                 )
         }
     }
@@ -158,7 +160,8 @@ private struct NodeLayer: View {
                 .sankeyNodeAccessibility(
                     node,
                     isSelected: selection?.wrappedValue == value,
-                    sortPriority: Double(layout.nodes.count - node.paletteIndex)
+                    sortPriority: Double(layout.nodes.count - node.paletteIndex),
+                    selectAction: selection == nil ? nil : { SankeyDiagram.toggle(value, in: selection) }
                 )
         }
     }
