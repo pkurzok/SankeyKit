@@ -59,6 +59,12 @@ xcodegen generate
 open SankeyDemo.xcodeproj
 ```
 
+## Swift Package Index
+
+`.spi.yml` tells the [Swift Package Index](https://swiftpackageindex.com) which target to build
+DocC documentation from. If you add a target whose documentation should be published, list it
+there too.
+
 ## Changes worth discussing first
 
 For anything larger than a bug fix, open an issue before writing code — it is cheaper to agree on
