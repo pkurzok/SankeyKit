@@ -51,10 +51,14 @@ extension View {
         transformEnvironment(\.sankeyConfiguration) { $0.metrics.linkSpacing = spacing }
     }
 
-    /// Sets how strongly the ribbons bend.
+    /// Sets where along the connection the ribbons do their bending.
     ///
-    /// - Parameter curvature: `0` draws straight ribbons, `1` bends as hard as possible. Values
-    ///   outside `0...1` are clamped. The default is 0.5.
+    /// A ribbon always leaves its source node and enters its target node horizontally. This value
+    /// decides how far the bend is pushed away from the two nodes and towards the middle.
+    ///
+    /// - Parameter curvature: `0` draws a straight diagonal, `0.5` the classic S-curve, and `1`
+    ///   concentrates the whole bend into a near-vertical step halfway across. Values outside
+    ///   `0...1` are clamped. The default is 0.5.
     public func sankeyLinkCurvature(_ curvature: Double) -> some View {
         transformEnvironment(\.sankeyConfiguration) { $0.metrics.curvature = curvature }
     }

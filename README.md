@@ -145,7 +145,7 @@ The `.value("Amount", …)` labels are optional. They cost nothing and make the 
 | `.sankeyNodeSpacing(_:)` | `8` | Vertical gap between nodes in a column. Shrinks automatically in crowded columns. |
 | `.sankeyNodeCornerRadius(_:)` | `3` | Corner radius of the node rectangles, capped at half their height. |
 | `.sankeyLinkSpacing(_:)` | `3` | Gap between ribbons where they meet a node. Taken out of the node edge, never added to it. |
-| `.sankeyLinkCurvature(_:)` | `0.5` | How hard ribbons bend, `0`–`1`. Clamped. |
+| `.sankeyLinkCurvature(_:)` | `0.5` | Where ribbons bend, `0`–`1`. Clamped. `0` a straight diagonal, `0.5` the classic S, `1` a step in the middle. |
 | `.sankeyLinkOpacity(_:)` | `0.75` | Ribbon opacity, `0`–`1`. Clamped. A link's own `.opacity(_:)` wins. |
 | `.sankeyColorScale(_:)` | built-in palette | Colors handed to nodes column by column, top to bottom, cycling. |
 

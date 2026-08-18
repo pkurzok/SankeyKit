@@ -37,6 +37,7 @@ struct SankeyDiagram: View {
                 layout: layout,
                 resolver: resolver,
                 opacity: metrics.linkOpacity,
+                overlap: metrics.nodeWidth / 2,
                 highlight: highlight,
                 selection: selection
             )
@@ -104,6 +105,8 @@ private struct RibbonLayer: View {
     var layout: SankeyLayoutResult
     var resolver: SankeyStyleResolver
     var opacity: Double
+    /// How far each ribbon end tucks under its node, hiding the seam at the node's rounded corners.
+    var overlap: CGFloat
     var highlight: SankeyHighlight?
     var selection: Binding<SankeySelection?>?
 
@@ -116,11 +119,11 @@ private struct RibbonLayer: View {
             let value = SankeySelection.link(source: laidOut.id.source, target: laidOut.id.target)
             let isRelated = highlight?.contains(link: laidOut.id) ?? true
 
-            RibbonShape(geometry: laidOut.geometry)
+            RibbonShape(geometry: laidOut.geometry, overlap: overlap)
                 .fill(resolver.shapeStyle(for: fill, spanning: laidOut.geometry))
                 .opacity(resolver.linkOpacity(laidOut, default: opacity) * SankeyDiagram.dimming(isRelated))
                 // Without this the ribbon would swallow taps across the whole canvas.
-                .contentShape(RibbonShape(geometry: laidOut.geometry))
+                .contentShape(RibbonShape(geometry: laidOut.geometry, overlap: overlap))
                 .onTapGesture { SankeyDiagram.toggle(value, in: selection) }
                 .sankeyLinkAccessibility(
                     laidOut,
