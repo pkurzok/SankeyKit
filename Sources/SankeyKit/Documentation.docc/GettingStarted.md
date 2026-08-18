@@ -164,6 +164,24 @@ Button("Save more") {
 Ribbons interpolate through their endpoints, and the curve is recomputed on every frame, so an
 intermediate frame is always a real ribbon rather than a bent approximation of one.
 
+### Driving a chart from a Toggle
+
+Wrap the write in `withAnimation` inside a custom `Binding` setter rather than reaching for
+`Binding.animation(_:)`:
+
+```swift
+Toggle("Put money aside", isOn: Binding(
+    get: { showsSavings },
+    set: { newValue in withAnimation(.snappy) { showsSavings = newValue } }
+))
+```
+
+On iOS 27 the transaction that `Binding.animation(_:)` attaches to a `Toggle`-initiated write is
+dropped: the switch thumb animates, but the chart re-lays out in a single frame. Animating in the
+setter runs inside the write itself, so the transaction survives — and it behaves identically on
+older releases. `Slider` and `Button` writes are unaffected, so `Binding.animation(_:)` remains the
+right choice for a slider, where both the drag and keyboard adjustments should animate.
+
 ## Where to go next
 
 The package ships a sample app under `Examples/SankeyDemo` with three screens — a budget, a
