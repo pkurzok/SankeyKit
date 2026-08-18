@@ -91,6 +91,29 @@ struct SelectionTests {
     func togglingWithoutBinding() {
         SankeyDiagram.toggle(.node("Budget"), in: nil)
     }
+
+    /// The accessibility action the diagram attaches is a closure over the very same toggle the tap
+    /// gesture calls, so activating an element from VoiceOver must behave exactly like tapping it.
+    @Test("The accessibility action toggles selection the same way a tap does")
+    func togglingThroughAnAction() {
+        var stored: SankeySelection?
+        let binding = Binding(get: { stored }, set: { stored = $0 })
+        func action(for value: SankeySelection) -> () -> Void {
+            { SankeyDiagram.toggle(value, in: binding) }
+        }
+
+        action(for: .node("Budget"))()
+        #expect(stored == .node("Budget"))
+
+        action(for: .node("Budget"))()
+        #expect(stored == nil)
+
+        action(for: .link(source: "Budget", target: "Rent"))()
+        #expect(stored == .link(source: "Budget", target: "Rent"))
+
+        action(for: .node("Salary"))()
+        #expect(stored == .node("Salary"))
+    }
 }
 
 @Suite("Accessibility descriptions")
@@ -125,6 +148,18 @@ struct AccessibilityTests {
             to: result.nodes.first { $0.id == "Budget" }
         )
         #expect(label == "Salary to Monthly Budget")
+    }
+
+    /// Traits are computed rather than branched on in the view body, which keeps every element a
+    /// single static view type; this is the rule that decides what assistive technologies announce.
+    @Test("Only a selectable chart announces its elements as buttons")
+    func traits() {
+        #expect(SankeyAccessibility.traits(isSelected: false, isSelectable: false) == [])
+        #expect(SankeyAccessibility.traits(isSelected: true, isSelectable: false) == .isSelected)
+        #expect(SankeyAccessibility.traits(isSelected: false, isSelectable: true) == .isButton)
+        #expect(
+            SankeyAccessibility.traits(isSelected: true, isSelectable: true) == [.isSelected, .isButton]
+        )
     }
 
     @Test("A link declared with a labelled value announces that label")

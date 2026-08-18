@@ -101,8 +101,10 @@ extension View {
     ///     .sankeySelection($selection)
     /// ```
     ///
-    /// > Note: On tvOS the diagram stays read-only. `onTapGesture` compiles there, but a shape
-    /// cannot take focus, so per-element taps never arrive.
+    /// > Note: On tvOS a shape cannot take focus, so per-element taps never arrive — pointer
+    /// selection stays unavailable there. Assistive technologies reach the selection on every
+    /// platform, though: with this modifier set, each node and ribbon is an accessibility button
+    /// whose activation toggles it.
     ///
     /// - Parameter selection: The binding that receives the selected element.
     public func sankeySelection(_ selection: Binding<SankeySelection?>) -> some View {
