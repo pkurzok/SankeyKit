@@ -45,8 +45,9 @@ between sits on its own node.
 
 ### Requirements
 
-iOS 17, macOS 14, tvOS 17, watchOS 10, visionOS 1, and Swift 6. Selection needs a tap, so on tvOS
-the diagram is read-only.
+iOS 17, macOS 14, tvOS 17, watchOS 10, visionOS 1, and Swift 6. Selection is driven by taps and by
+accessibility activation. tvOS has no pointer, so there a chart is selectable through VoiceOver but
+not by remote alone.
 
 ## Topics
 

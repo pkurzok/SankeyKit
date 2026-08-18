@@ -1,6 +1,6 @@
 ---
 date: 2026-08-18T09:11:23+00:00
-git_commit: 9b8c414c17dfe0a9ce459c1677b486d037fd17e1
+git_commit: ""
 branch: main
 topic: "SwiftUI-way audit fixes: accessible selection and demo cleanup"
 tags: [plan, sankey-diagram, accessibility, sankey-demo]
@@ -273,8 +273,8 @@ fix; it is retained on its own merits, and the comments that credited it with fi
 bug were corrected.
 
 **Device signing.** `project.yml` sets no `DEVELOPMENT_TEAM` (ad-hoc signing), so a device build
-needs `DEVELOPMENT_TEAM=V8V68LQ9MV` passed to `xcodebuild` — the team the installed app is signed
-with. Passing a different team fails with `MismatchedApplicationIdentifierEntitlement`.
+needs `DEVELOPMENT_TEAM=<your team ID>` passed to `xcodebuild` — the team the installed app is
+signed with. Passing a different team fails with `MismatchedApplicationIdentifierEntitlement`.
 
 ## References
 

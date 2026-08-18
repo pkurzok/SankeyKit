@@ -1,6 +1,6 @@
 ---
 date: 2026-08-17T20:57:14.662388+00:00
-git_commit: 7d5fa066f398c19e619f9d586ae43fc473843833
+git_commit: ""
 branch: main
 topic: "Curved ribbons — adopt D3's bumpX control points"
 tags: [plan, RibbonGeometry, RibbonShape, SankeyLayout, documentation]

@@ -1,6 +1,6 @@
 ---
 date: 2026-08-18T11:26:28.685316+00:00
-git_commit: 97b2b1f5dfbc4051578298aaa86f9477c5b2d44b
+git_commit: ""
 branch: main
 topic: "Restore toggle-driven chart animations on iOS 27"
 tags: [plan, sankey-demo, docs, animation, ios27]
@@ -18,7 +18,7 @@ transaction that `Binding.animation(_:)` attaches to a `Toggle`-initiated write.
 thumb still animates, but every downstream view update — here the structural add/remove of a
 `SankeyLink` mark — runs without animation. Evidence:
 
-- Commit `97b2b1f` (the suspected cause) and its parent `9b8c414` show the **identical**
+- The toggle-accessibility commit (the suspected cause) and its parent show the **identical**
   single-frame jump on iOS 27; the same build morphs smoothly on iOS 26.5. So the latest change
   did not introduce the bug — the OS did.
 - Writing through the very same `$flag.animation(.snappy)` binding programmatically (from a
@@ -238,7 +238,7 @@ During implementation, document user feedback, problems, and decisions here.
 ## References
 
 - Root-cause evidence: frame-by-frame recordings analyzed in this planning session — iOS 27
-  jump on HEAD `97b2b1f` and parent `9b8c414`; smooth on iOS 26.5; smooth on iOS 27 with the
+  jump on the toggle-accessibility commit and its parent; smooth on iOS 26.5; smooth on iOS 27 with the
   `withAnimation`-setter binding.
 - `Examples/SankeyDemo/Sources/FinanceDemoView.swift`, `PlaygroundView.swift` — affected views
 - `Sources/SankeyKit/Documentation.docc/GettingStarted.md` — "Animate value changes" section
@@ -246,5 +246,5 @@ During implementation, document user feedback, problems, and decisions here.
   https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-27-release-notes
 - Analogous fixed regression (iOS 26 beta 3 Form row animations):
   https://developer.apple.com/forums/thread/793278
-- PR #3 (`97b2b1f`) — the change that was suspected but is not the cause; it moved the demo
+- PR #3 (the toggle-accessibility commit) — the change that was suspected but is not the cause; it moved the demo
   *sliders* onto `Binding.animation`, which iOS 27 does not break

@@ -52,7 +52,7 @@ Build a new Swift Package `SankeyKit` that renders Sankey diagrams in SwiftUI wi
 
 ## Current State
 
-`/Users/peter.kurzok/ws-privat/SankeyKit/` is empty (greenfield, not yet a git repository). Tooling verified: Xcode 27.0 (beta), SwiftLint 0.65.0, XcodeGen, `gh` authenticated as `pkurzok` with `repo` scope. Apple ships no Sankey API (verified via cupertino) — no naming collisions.
+The package root is empty (greenfield, not yet a git repository). Tooling verified: Xcode 27.0 (beta), SwiftLint 0.65.0, XcodeGen, `gh` authenticated as `pkurzok` with `repo` scope. Apple ships no Sankey API (verified via cupertino) — no naming collisions.
 
 ## Desired End State
 
