@@ -96,7 +96,9 @@ struct DemoScreen<Chart: View, Controls: View>: View {
             controls
         }
         .padding(20)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        // Without a minimum width the caption can be squeezed into a very narrow column, and
+        // the window then adopts the height that wrapped paragraph needs — thousands of points.
+        .frame(minWidth: 480, maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 
