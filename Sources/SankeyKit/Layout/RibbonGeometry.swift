@@ -6,6 +6,10 @@ import CoreGraphics
 /// A ribbon is drawn as two cubic Bézier curves — one along the top edge, one along the bottom —
 /// joined by straight vertical caps at the two nodes.
 ///
+/// A ribbon leaves its source node and enters its target node horizontally: both control points
+/// stay level with the endpoint they belong to, so the curve meets each node edge at a right angle
+/// and does all of its bending in between.
+///
 /// The two ends can differ in thickness. A node inserts a small gap between the ribbons attached
 /// to it (see ``SankeyMetrics/linkSpacing``), and how much of the node edge that consumes depends
 /// on how many ribbons meet there. A ribbon therefore tapers slightly from one end to the other.
@@ -18,7 +22,10 @@ struct RibbonGeometry: Equatable, Sendable {
     var startThickness: CGFloat
     /// Vertical thickness at the target node.
     var endThickness: CGFloat
-    /// How far the control points travel along the connection, `0`–`1`.
+    /// How far the control points travel *horizontally* along the connection, `0`–`1`.
+    ///
+    /// `0` leaves them on the endpoints and draws a straight diagonal; `0.5` puts them on the
+    /// horizontal midpoint; `1` sends each one all the way to the opposite end.
     var curvature: Double
 
     /// The smallest horizontal control-point offset. Keeps the curve bending immediately at the
@@ -31,13 +38,16 @@ struct RibbonGeometry: Equatable, Sendable {
     }
 
     /// The two control points of the center curve.
+    ///
+    /// Each control point keeps its endpoint's `y` and only travels horizontally, which is what
+    /// gives the ribbon its flat tangent at both nodes. At the default curvature of `0.5` both
+    /// land on the horizontal midpoint of the connection, making the curve `d3-shape`'s `bumpX`.
     var controlPoints: (first: CGPoint, second: CGPoint) {
         let offset = controlOffset
         let factor = CGFloat(curvature)
-        let rise = end.y - start.y
         return (
-            CGPoint(x: start.x + offset * factor, y: start.y + rise * factor),
-            CGPoint(x: end.x - offset * factor, y: end.y - rise * factor)
+            CGPoint(x: start.x + offset * factor, y: start.y),
+            CGPoint(x: end.x - offset * factor, y: end.y)
         )
     }
 

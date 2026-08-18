@@ -118,6 +118,10 @@ SankeyChart { /* … */ }
     .sankeyColorScale([.blue, .cyan, .teal, .green, .yellow, .orange])
 ```
 
+Ribbons always leave and enter their nodes horizontally; the curvature number only says where the
+bend sits between them — `0` draws a straight diagonal, `0.5` the classic S-curve, and `1` packs the
+whole bend into a step halfway across.
+
 Colors are handed to nodes column by column, top to bottom, and cycle when the diagram has more
 nodes than colors. A scale ordered by hue gives the cleanest ribbons, because neighbouring nodes
 then blend through neighbouring hues.

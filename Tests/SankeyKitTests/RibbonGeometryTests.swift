@@ -20,13 +20,74 @@ struct RibbonGeometryTests {
         )
     }
 
-    @Test("Control points follow the article formula")
+    @Test("Control points keep their endpoint's y, as in d3-shape's bumpX")
     func controlPointFormula() {
         let geometry = ribbon(from: CGPoint(x: 10, y: 20), to: CGPoint(x: 110, y: 80), curvature: 0.5)
         let (first, second) = geometry.controlPoints
-        // dx = 100, v = 0.5, rise = 60
-        #expect(first == CGPoint(x: 60, y: 50))
-        #expect(second == CGPoint(x: 60, y: 50))
+        // dx = 100, v = 0.5
+        #expect(first == CGPoint(x: 60, y: 20))
+        #expect(second == CGPoint(x: 60, y: 80))
+    }
+
+    @Test("Both ends leave their node horizontally")
+    func horizontalTangents() {
+        let geometry = ribbon(
+            from: CGPoint(x: 0, y: 0),
+            to: CGPoint(x: 100, y: 60),
+            thickness: 20,
+            endThickness: 10
+        )
+        #expect(geometry.topCurve.control1.y == geometry.topCurve.start.y)
+        #expect(geometry.topCurve.control2.y == geometry.topCurve.end.y)
+        #expect(geometry.bottomCurve.control1.y == geometry.bottomCurve.start.y)
+        #expect(geometry.bottomCurve.control2.y == geometry.bottomCurve.end.y)
+    }
+
+    @Test("The default curvature matches d3-shape's bumpX")
+    func defaultCurvatureMatchesBumpX() {
+        let geometry = ribbon(from: CGPoint(x: 0, y: 0), to: CGPoint(x: 200, y: 100))
+        let (first, second) = geometry.controlPoints
+        // bumpX emits bezierCurveTo((x0 + x1) / 2, y0, (x0 + x1) / 2, y1, x1, y1).
+        #expect(first == CGPoint(x: 100, y: 0))
+        #expect(second == CGPoint(x: 100, y: 100))
+    }
+
+    @Test("A sloped ribbon's control points never coincide")
+    func slopedControlPointsAreDistinct() {
+        let geometry = ribbon(from: CGPoint(x: 10, y: 20), to: CGPoint(x: 110, y: 80))
+        #expect(geometry.controlPoints.first != geometry.controlPoints.second)
+    }
+
+    @Test("The curve is symmetric about the middle of the connection")
+    func curvePassesThroughTheMidpoint() {
+        let geometry = ribbon(from: CGPoint(x: 10, y: 20), to: CGPoint(x: 110, y: 80))
+        let (first, second) = geometry.controlPoints
+        let middle = cubic(
+            at: 0.5,
+            geometry.start,
+            first,
+            second,
+            geometry.end
+        )
+        #expect(abs(middle.x - 60) < 1e-9)
+        #expect(abs(middle.y - 50) < 1e-9)
+    }
+
+    /// Evaluates a cubic Bézier at `t`, for checking the shape the control points describe.
+    private func cubic(
+        at t: CGFloat,
+        _ p0: CGPoint,
+        _ p1: CGPoint,
+        _ p2: CGPoint,
+        _ p3: CGPoint
+    ) -> CGPoint {
+        let u = 1 - t
+        let weights = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t]
+        let points = [p0, p1, p2, p3]
+        return zip(weights, points).reduce(into: CGPoint.zero) { result, pair in
+            result.x += pair.0 * pair.1.x
+            result.y += pair.0 * pair.1.y
+        }
     }
 
     @Test("The horizontal control offset is clamped for close or overlapping columns")
