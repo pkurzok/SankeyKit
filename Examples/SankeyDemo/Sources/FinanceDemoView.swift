@@ -32,8 +32,16 @@ struct FinanceDemoView: View {
             .sankeyNodeCornerRadius(4)
             .sankeyLinkCurvature(0.5)
         } controls: {
-            Toggle("Put money aside", isOn: $showsSavings.animation(.snappy))
-                .toggleStyle(.switch)
+            // Deliberately not `$showsSavings.animation(.snappy)`: iOS 27 drops the transaction
+            // that `Binding.animation(_:)` attaches to a Toggle's write, so the chart would
+            // re-lay out in a single frame. Animating inside the setter runs synchronously with
+            // the write and keeps the morph on every OS version. Sliders and buttons are
+            // unaffected, which is why `ValueSlider` still uses the binding-animation pattern.
+            Toggle("Put money aside", isOn: Binding(
+                get: { showsSavings },
+                set: { newValue in withAnimation(.snappy) { showsSavings = newValue } }
+            ))
+            .toggleStyle(.switch)
         }
     }
 

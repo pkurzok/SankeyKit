@@ -32,8 +32,15 @@ struct PlaygroundView: View {
                 ValueSlider("Groceries", value: $groceries, range: 100...2000)
                 ValueSlider("Savings", value: $savings, range: 100...3000)
 
-                Toggle("Side gig", isOn: $showsSideGig.animation(.snappy))
-                    .toggleStyle(.switch)
+                // Animated in the setter rather than via `$showsSideGig.animation(.snappy)`:
+                // iOS 27 drops the transaction a `Binding.animation(_:)` attaches to a Toggle's
+                // write, so the chart would jump. See `FinanceDemoView` for the full note. The
+                // sliders above keep the binding-animation pattern — Slider's write path is fine.
+                Toggle("Side gig", isOn: Binding(
+                    get: { showsSideGig },
+                    set: { newValue in withAnimation(.snappy) { showsSideGig = newValue } }
+                ))
+                .toggleStyle(.switch)
 
                 Button("Shuffle") {
                     withAnimation(.snappy) {
