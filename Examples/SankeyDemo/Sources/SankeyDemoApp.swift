@@ -96,7 +96,14 @@ struct DemoScreen<Chart: View, Controls: View>: View {
             controls
         }
         .padding(20)
+        #if os(macOS)
+        // Without a minimum width the caption can be squeezed into a very narrow column, and
+        // the window then adopts the height that wrapped paragraph needs — thousands of points.
+        // A phone is narrower than this minimum, so it only applies where the window sizing is.
+        .frame(minWidth: 480, maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        #else
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        #endif
     }
 }
 
