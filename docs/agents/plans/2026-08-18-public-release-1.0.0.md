@@ -307,19 +307,19 @@ files. Lands on a branch; the PR opens here and is merged at the end of Phase 2.
       `SankeyGraph`/`SankeyLayout` rather than views, and never hand-edit the generated
       `SankeyDemo.xcodeproj` — edit `Examples/SankeyDemo/project.yml` and re-run `xcodegen generate`
 - [x] Link `CHANGELOG.md` and `CONTRIBUTING.md` from the README's Development section
-- [-] Open the PR with `gh pr create`
+- [x] Open the PR with `gh pr create`
 
 **Automated Verification**:
-- [ ] `git grep -n "$TEAM_ID"` returns nothing
-- [ ] `git grep -n "$HOME_PATH"` returns nothing
-- [ ] `git grep -nE '^git_commit: [0-9a-f]{7,}' -- docs` returns nothing
-- [ ] The number in `README.md:52` equals the count in
+- [x] `git grep -n "$TEAM_ID"` returns nothing
+- [x] `git grep -n "$HOME_PATH"` returns nothing
+- [x] `git grep -nE '^git_commit: [0-9a-f]{7,}' -- docs` returns nothing
+- [x] The number in `README.md:52` equals the count in
       `swift test 2>&1 | grep -oE 'with [0-9]+ tests' | grep -oE '[0-9]+'`
-- [ ] `grep -c 'offset in both axes' README.md` returns 0
-- [ ] `test -f CHANGELOG.md && test -f CONTRIBUTING.md && grep -q '1.0.0' CHANGELOG.md`
-- [ ] `swift build`, `swift test` and `swiftlint --strict` all pass
-- [ ] `swift package generate-documentation --target SankeyKit` succeeds
-- [ ] Every URL in the rewritten Credits section returns HTTP 200
+- [x] `grep -c 'offset in both axes' README.md` returns 0
+- [x] `test -f CHANGELOG.md && test -f CONTRIBUTING.md && grep -q '1.0.0' CHANGELOG.md`
+- [x] `swift build`, `swift test` and `swiftlint --strict` all pass
+- [x] `swift package generate-documentation --target SankeyKit` succeeds
+- [x] Every URL in the rewritten Credits section returns HTTP 200
 
 ---
 
@@ -331,7 +331,7 @@ Prove the README's platform table on the GitHub runner, then make `Package.swift
 agree with whatever the runner reports.
 
 **Tasks**:
-- [ ] Add a `platforms` job to `.github/workflows/ci.yml`:
+- [-] Add a `platforms` job to `.github/workflows/ci.yml`:
 
       ```yaml
         platforms:
