@@ -238,7 +238,7 @@ describes the curvature knob in line with what it now does.
 - [x] `Sources/SankeyKit/Documentation.docc/GettingStarted.md` — add one sentence under
       "Style the chart" explaining the curvature number, since it is the least self-evident modifier
       in that code block.
-- [ ] Re-capture the seven screenshots in `Sources/SankeyKit/Documentation.docc/Resources/`, keeping
+- [x] Re-capture the seven screenshots in `Sources/SankeyKit/Documentation.docc/Resources/`, keeping
       the existing framing and file names: `sankey-hero@2x.jpg`, `sankey-hero~dark@2x.jpg`,
       `sankey-energy@2x.jpg`, `sankey-energy~dark@2x.jpg`, `sankey-selection@2x.jpg`,
       `sankey-selection~dark@2x.jpg`, `sankey-demo@2x.jpg`.
@@ -263,7 +263,7 @@ describes the curvature knob in line with what it now does.
       clean S on every intermediate frame.
 - [x] Run the `SankeyDemo` app and confirm the diagram still reads correctly on a phone-width
       canvas, where the columns are closest together and the 24 pt offset floor takes over.
-- [ ] The seven re-captured screenshots show the new curves, in both colour schemes.
+- [x] The seven re-captured screenshots show the new curves, in both colour schemes.
 
 ## Implementation Notes
 
